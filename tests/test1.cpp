@@ -75,13 +75,8 @@ int main()
         auto merged_str = neu::merge_str(basic_str, std::move(delta));
 #if DEBUG_PRINT
         std::cout << "merged_str: " << merged_str << '\n';
-        for (int i{0}; i < log_str.size(); ++i)
-        {
-            if (log_str[i] != merged_str[i])
-            {
-                std::cout << i << ' ' << log_str[i] << ' ' << merged_str[i] << '\n';
-            }
-        }
+        assert(merged_str == log_str);
+        std::cout << "merge correct\n";
 #endif
 #else
 
