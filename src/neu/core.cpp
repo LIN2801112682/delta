@@ -1,11 +1,11 @@
 #include "neu/core.h"
 #include <array>
 
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 
 namespace neu
 {
-    std::stack<node> backtracking_path(const std::string &basic_str, const std::string &log_str)
+    std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str)
     {
         std::stack<node> delta{};
         int m{static_cast<int>(basic_str.size())};
@@ -118,5 +118,42 @@ namespace neu
             --n;
         }
         return delta;
+    }
+
+    std::string merge_str(std::string_view basic_str, std::stack<node> &&delta)
+    {
+        std::string merged_str{};
+        int i{0};
+        while (i < basic_str.size())
+        {
+            if (delta.empty())
+            {
+                merged_str += basic_str.substr(i);
+                break;
+            }
+            auto d{delta.top()};
+            delta.pop();
+            switch (d.type_)
+            {
+            case node_type::insert:
+                merged_str += basic_str.substr(i, d.low_ - i + 1);
+                merged_str += d.content_;
+                i = d.high_;
+                break;
+            case node_type::del:
+                merged_str += basic_str.substr(i, d.low_ - i);
+                i = d.high_ + 1;
+                break;
+            case node_type::replace:
+                merged_str += basic_str.substr(i, d.low_ - i);
+                merged_str += d.content_;
+                i = d.high_ + 1;
+                break;
+            default:
+                assert(false);
+                break;
+            }
+        }
+        return merged_str;
     }
 };

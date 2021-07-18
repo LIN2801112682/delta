@@ -2,11 +2,13 @@
 #define _DELTA_CORE_H_
 
 #include "neu/node.h"
+#include <string_view>
 #include <stack>
 
 namespace neu
 {
-    std::stack<node> backtracking_path(const std::string &basic_str, const std::string &log_str);
+    std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str);
+    std::string merge_str(std::string_view basic_str, std::stack<node> &&delta);
 };
 
 #endif

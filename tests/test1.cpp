@@ -7,6 +7,7 @@
 #include <bitset>
 
 #define DEBUG_PRINT 1
+#define TEST_MERGE 1
 
 static const std::string basic_file_path{"../resources/chr0716.txt"};
 static const std::string log_file_path{"../resources/query.txt"};
@@ -70,6 +71,19 @@ int main()
 #endif
         auto delta{neu::backtracking_path(basic_str, log_str)};
         int delta_size{static_cast<int>(delta.size())};
+#if TEST_MERGE
+        auto merged_str = neu::merge_str(basic_str, std::move(delta));
+#if DEBUG_PRINT
+        std::cout << "merged_str: " << merged_str << '\n';
+        for (int i{0}; i < log_str.size(); ++i)
+        {
+            if (log_str[i] != merged_str[i])
+            {
+                std::cout << i << ' ' << log_str[i] << ' ' << merged_str[i] << '\n';
+            }
+        }
+#endif
+#else
 
         std::bitset<k_size_bytes * k_byte_to_bits> delta_size_bs(delta_size);
         delta_ofs.write((char *)&delta_size_bs, k_size_bytes);
@@ -98,5 +112,6 @@ int main()
             delta_ofs.write((char *)&content_size_bs, k_size_bytes);
             delta_ofs.write((char *)d.content_.c_str(), content_size);
         }
+#endif
     }
 }
