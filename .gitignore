@@ -1,0 +1,9 @@
+/.vscode
+/.idea
+.DS_Store
+/build
+/cmake-build-default
+/cmake-build-debug
+/cmake-build-release
+/cmake-build-minsizerel
+/cmake-build-relwithdebinfo
