@@ -71,7 +71,7 @@ namespace neu
 #if DEBUG_PRINT
                 std::cout << "delete: " << basic_str[m - 1] << " at: " << m - 1 << '\n';
 #endif
-                node a{m - 1, m - 1, node_type::del, "-"};
+                node a{m - 1, m - 1, node_type::del, "-"};  // todo: tokenlize
                 if (delta.empty())
                 {
                     delta.push(a);
