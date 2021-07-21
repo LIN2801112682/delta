@@ -55,7 +55,7 @@ namespace neu
         for (size_t i{0}; i < merged_str.size(); ++i)
         {
             const auto &ch{merged_str[i]};
-            if (ch != ' ')
+            if (ch != ' ' && ch != '\"' && ch != '.' && ch != '\'' && ch != '(' && ch != ')' )
             {
                 if (!is_find_begin)
                 {
@@ -64,7 +64,7 @@ namespace neu
                 }
                 end = i;
             }
-            if (ch == ' ' || i == merged_str.size() - 1 && is_find_begin)
+            if (ch == ' ' || ch == '\"' || ch == '.' || ch == '\'' || ch == '(' || ch == ')' || i == merged_str.size() - 1 && is_find_begin)
             {
                 is_find_begin = false;
                 const auto &token = merged_str.substr(begin, end - begin + 1);
