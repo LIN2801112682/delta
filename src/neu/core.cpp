@@ -156,4 +156,10 @@ namespace neu
         }
         return merged_str;
     }
+
+    std::tuple<std::string, std::vector<node>::size_type, std::vector<node>::size_type>
+    partial_merge_str(std::string_view basic_str, const std::vector<node> &delta, const std::vector<node>::size_type index)
+    {
+        return {{}, {}, {}};
+    }
 };

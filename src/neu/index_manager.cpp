@@ -46,7 +46,7 @@ namespace neu
     {
         for (std::vector<node>::size_type index{0}; index < delta.size(); ++index)
         {
-            //auto [merged_str, left_index, _] = partial_merge_str(basic_str_, delta, index);
+            auto [merged_str, left_index, _] = partial_merge_str(basic_str_, delta, index);
             std::string token{};
             offset_type offset{};
             auto &doc_id_umap{inverted_index_[token]};
