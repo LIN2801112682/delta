@@ -1,5 +1,5 @@
-#ifndef _DELTA_CORE_H_
-#define _DELTA_CORE_H_
+#ifndef _NEU_CORE_H_
+#define _NEU_CORE_H_
 
 #include "neu/node.h"
 #include <string_view>

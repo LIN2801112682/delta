@@ -1,5 +1,5 @@
-#ifndef _DELTA_NODE_H_
-#define _DELTA_NODE_H_
+#ifndef _NEU_NODE_H_
+#define _NEU_NODE_H_
 
 #include <string>
 #include <iostream>

@@ -11,3 +11,6 @@ aux_source_directory(src/neu NEU)
 add_executable (test1 tests/test1.cpp
     ${NEU}
 )
+
+add_executable (test2 tests/test2.cpp
+)
