@@ -7,21 +7,24 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <tuple>
 
 namespace neu
 {
     class index_manager
     {
-    private:
+    public:
         using doc_id_type = std::vector<std::string>::size_type;
         using offset_type = std::string::size_type;
         using basic_inverted_index_type = std::unordered_map<std::string, std::unordered_set<offset_type>>;
         using inverted_index_type = std::unordered_map<std::string, std::unordered_map<doc_id_type, std::unordered_set<offset_type>>>;
-    public:
         index_manager(const std::string &basic_str);
-        void push_doc_by_id_and_delta(const doc_id_type doc_id, const std::vector<node> &delta);
+        void push_token_by_id_and_delta(const doc_id_type doc_id, const std::vector<node> &delta);
+        std::vector<std::unordered_set<offset_type>> regex_query(const std::string &regex_str);
+
     private:
-        basic_inverted_index_type basic_inverted_index_{};
+        const std::string basic_str_;
+        const basic_inverted_index_type basic_inverted_index_;
         inverted_index_type inverted_index_{};
     };
 };

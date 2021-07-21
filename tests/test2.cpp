@@ -29,44 +29,38 @@ int main()
     std::cout << "basic_str: " << basic_str << '\n';
 #endif
 
-    std::ifstream log_ifs{log_file_path, std::ios::in};
-    SCOPE_GUARD
-    {
-        log_ifs.close();
-    };
-
-    std::string log_str{};
     std::vector<std::vector<neu::node>> delta_vec;
-    while (getline(log_ifs, log_str))
     {
-#if DEBUG_PRINT
-        std::cout << "log_str: " << log_str << '\n';
-#endif
-        auto delta{neu::backtracking_path(basic_str, log_str)};
-#if TEST_MERGE
-        auto merged_str = neu::merge_str(basic_str, std::move(delta));
-#if DEBUG_PRINT
-        std::cout << "merged_str: " << merged_str << '\n';
-#endif
-        assert(merged_str == log_str);
-        std::cout << "merge correct\n";
-#else
-        std::vector<neu::node> vdelta{};
-        while (!delta.empty())
+        std::ifstream log_ifs{log_file_path, std::ios::in};
+        SCOPE_GUARD
         {
-            vdelta.emplace_back(delta.top());
-            delta.pop();
-        }
-        delta_vec.emplace_back(vdelta);
+            log_ifs.close();
+        };
+
+        std::string log_str{};
+        while (getline(log_ifs, log_str))
+        {
+#if DEBUG_PRINT
+            std::cout << "log_str: " << log_str << '\n';
 #endif
+            auto delta{neu::backtracking_path(basic_str, log_str)};
+            std::vector<neu::node> vdelta{};
+            while (!delta.empty())
+            {
+                vdelta.emplace_back(delta.top());
+                delta.pop();
+            }
+            delta_vec.emplace_back(vdelta);
+        }
     }
-#if !TEST_MERGE
+
     neu::index_manager manager{basic_str};
-    int doc_id{1};
+    neu::index_manager::doc_id_type doc_id{1};
     for (const auto &delta : delta_vec)
     {
-        manager.push_doc_by_id_and_delta(doc_id, delta);
+        manager.push_token_by_id_and_delta(doc_id, delta);
+        ++doc_id;
     }
-#endif
+
     return 0;
 }
