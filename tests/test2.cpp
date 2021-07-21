@@ -8,7 +8,6 @@
 #include <bitset>
 
 #define DEBUG_PRINT 0
-#define TEST_MERGE 0
 
 static const std::string basic_file_path{"../resources/chr3.txt"};
 static const std::string log_file_path{"../resources/query2.txt"};
@@ -54,6 +53,7 @@ int main()
         }
     }
 
+    auto init_begin_time = std::chrono::high_resolution_clock::now();
     neu::index_manager manager{basic_str};
     neu::index_manager::doc_id_type doc_id{1};
     for (const auto &delta : delta_vec)
@@ -61,6 +61,10 @@ int main()
         manager.push_token_by_id_and_delta(doc_id, delta);
         ++doc_id;
     }
+    auto init_end_time = std::chrono::high_resolution_clock::now();
+    auto init_elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(init_end_time - init_begin_time);
+    auto init_program_times = init_elapsed_time.count();
+    std::cout << "Init sum time: " << init_program_times << '\n';
 
     std::vector<std::string> regex_str_vec{};
     {
@@ -77,10 +81,29 @@ int main()
         }
     }
 
+    auto begin_time = std::chrono::high_resolution_clock::now();
     for (const auto &regex_str : regex_str_vec)
     {
-        manager.regex_query(regex_str);
+#if DEBUG_PRINT
+        std::cout << "regex_str: " << regex_str << '\n';
+#endif
+        auto begin_time = std::chrono::high_resolution_clock::now();
+        auto result{manager.regex_query(regex_str)};
+        int sum{0};
+        for (const auto &offset_set : result)
+        {
+            sum += offset_set.size();
+        }
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
+        auto program_times = elapsed_time.count();
+        std::cout << "  Regex query time: " << program_times
+                  << ", query sum: " << sum << '\n';
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
+    auto program_times = elapsed_time.count();
+    std::cout << "Regex query sum time: " << program_times << '\n';
 
     return 0;
 }
