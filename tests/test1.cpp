@@ -70,7 +70,6 @@ int main()
         std::cout << "log_str: " << log_str << '\n';
 #endif
         auto delta{neu::backtracking_path(basic_str, log_str)};
-        int delta_size{static_cast<int>(delta.size())};
 #if TEST_MERGE
         auto merged_str = neu::merge_str(basic_str, std::move(delta));
 #if DEBUG_PRINT
@@ -80,6 +79,7 @@ int main()
 #endif
 #else
 
+        int delta_size{static_cast<int>(delta.size())};
         std::bitset<k_size_bytes * k_byte_to_bits> delta_size_bs(delta_size);
         delta_ofs.write((char *)&delta_size_bs, k_size_bytes);
 
