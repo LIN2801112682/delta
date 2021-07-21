@@ -79,7 +79,7 @@ namespace neu
     std::vector<std::unordered_set<index_manager::offset_type>>
     index_manager::regex_query(const std::string &regex_str)
     {
-        std::vector<std::unordered_set<index_manager::offset_type>> result(inverted_index_.size());
+        std::vector<std::unordered_set<index_manager::offset_type>> result(delta_vec_.size());
         std::regex pattern{regex_str};
         std::smatch match{};
         for (const auto &[token, doc_id_umap] : inverted_index_)

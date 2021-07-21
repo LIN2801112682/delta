@@ -164,7 +164,7 @@ namespace neu
         int j{0};
         while (i < basic_str.size())
         {
-            if (delta.empty())
+            if (j == delta.size())
             {
                 merged_str += basic_str.substr(i);
                 break;
