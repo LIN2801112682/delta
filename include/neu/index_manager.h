@@ -12,3 +12,5 @@ namespace neu
         void push_doc_line(const int doc_id, const std::string &doc_str);
     };
 }
+
+#endif
