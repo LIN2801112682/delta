@@ -62,5 +62,25 @@ int main()
         ++doc_id;
     }
 
+    std::vector<std::string> regex_str_vec{};
+    {
+        std::ifstream regex_ifs{regex_file_path, std::ios::in};
+        SCOPE_GUARD
+        {
+            regex_ifs.close();
+        };
+
+        std::string regex_str{};
+        while (getline(regex_ifs, regex_str))
+        {
+            regex_str_vec.emplace_back(regex_str);
+        }
+    }
+
+    for (const auto &regex_str : regex_str_vec)
+    {
+        manager.regex_query(regex_str);
+    }
+
     return 0;
 }
