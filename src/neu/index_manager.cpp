@@ -3,6 +3,7 @@
 #include "neu/core.h"
 
 #include <sstream>
+#include <regex>
 
 namespace neu
 {
@@ -42,10 +43,32 @@ namespace neu
     }
 
     void
-    index_manager::push_token_by_id_and_delta(const doc_id_type doc_id, const std::vector<node> &delta)
+    index_manager::push_delta(const std::vector<node> &delta)
     {
+        delta_vec_.emplace_back(delta);
+        auto doc_id{delta_vec_.size() - 1};
         for (std::vector<node>::size_type index{0}; index < delta.size(); ++index)
         {
+            auto &cur_node{delta[index]};
+            /*
+            switch (cur_node.type_)
+            {
+            case node_type::insert:
+                merged_str += basic_str.substr(i, d.low_ - i + 1);
+                merged_str += d.content_;
+                i = d.high_;
+                break;
+            case node_type::del:
+                merged_str += basic_str.substr(i, d.low_ - i);
+                i = d.high_ + 1;
+                break;
+            case node_type::replace:
+                break; 
+            default:
+                assert(false);
+                break;
+            }
+            */
             auto [merged_str, left_index, _] = partial_merge_str(basic_str_, delta, index);
             std::string token{};
             offset_type offset{};
@@ -58,6 +81,23 @@ namespace neu
     std::vector<std::unordered_set<index_manager::offset_type>>
     index_manager::regex_query(const std::string &regex_str)
     {
+        std::regex pattern{regex_str};
+        std::smatch result{};
+        for (const auto &[basic_token, offset_set] : basic_inverted_index_)
+        {
+            if (std::regex_match(basic_token, result, pattern))
+            {
+
+            }
+        }
+
+        for (const auto &delta : delta_vec_)
+        {
+            for (std::vector<node>::size_type index{0}; index < delta.size(); ++index)
+            {
+
+            }
+        }
         return {};
     }
 };

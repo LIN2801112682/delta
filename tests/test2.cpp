@@ -55,11 +55,9 @@ int main()
 
     auto init_begin_time = std::chrono::high_resolution_clock::now();
     neu::index_manager manager{basic_str};
-    neu::index_manager::doc_id_type doc_id{1};
     for (const auto &delta : delta_vec)
     {
-        manager.push_token_by_id_and_delta(doc_id, delta);
-        ++doc_id;
+        manager.push_delta(delta);
     }
     auto init_end_time = std::chrono::high_resolution_clock::now();
     auto init_elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(init_end_time - init_begin_time);
