@@ -7,6 +7,7 @@
 
 namespace neu
 {
+    
     std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str);
     std::string merge_str(std::string_view basic_str, std::stack<node> &&delta);
 };

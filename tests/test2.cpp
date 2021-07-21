@@ -1,5 +1,6 @@
 #include "neu/core.h"
 #include "neu/node.h"
+#include "neu/index_manager.h"
 #include "utils/scope_exit.hpp"
 #include <string>
 #include <fstream>
@@ -28,23 +29,6 @@ int main()
     std::cout << "basic_str: " << basic_str << '\n';
 #endif
 
-    int log_size{0};
-    {
-        std::ifstream log_ifs{log_file_path, std::ios::in};
-        SCOPE_GUARD
-        {
-            log_ifs.close();
-        };
-        std::string log_str{};
-        while (getline(log_ifs, log_str))
-        {
-            ++log_size;
-        }
-    }
-#if DEBUG_PRINT
-    std::cout << "log_size: " << log_size << '\n';
-#endif
-
     std::ifstream log_ifs{log_file_path, std::ios::in};
     SCOPE_GUARD
     {
@@ -52,6 +36,7 @@ int main()
     };
 
     std::string log_str{};
+    std::vector<std::vector<neu::node>> delta_vec;
     while (getline(log_ifs, log_str))
     {
 #if DEBUG_PRINT
@@ -66,8 +51,22 @@ int main()
         assert(merged_str == log_str);
         std::cout << "merge correct\n";
 #else
-
+        std::vector<neu::node> vdelta{};
+        while (!delta.empty())
+        {
+            vdelta.emplace_back(delta.top());
+            delta.pop();
+        }
+        delta_vec.emplace_back(vdelta);
 #endif
     }
+#if !TEST_MERGE
+    neu::index_manager manager{basic_str};
+    int doc_id{1};
+    for (const auto &delta : delta_vec)
+    {
+        manager.push_doc_by_id_and_delta(doc_id, delta);
+    }
+#endif
     return 0;
 }
