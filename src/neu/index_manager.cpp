@@ -84,7 +84,7 @@ namespace neu
         std::smatch match{};
         for (const auto &[token, doc_id_umap] : inverted_index_)
         {
-            if (std::regex_match(token, match, pattern))
+            if (regex_match(token, match, pattern))
             {
                 for (const auto &[doc_id, offset_set] : doc_id_umap)
                 {
