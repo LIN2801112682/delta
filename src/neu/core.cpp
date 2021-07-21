@@ -157,9 +157,41 @@ namespace neu
         return merged_str;
     }
 
-    std::tuple<std::string, std::vector<node>::size_type, std::vector<node>::size_type>
-    partial_merge_str(std::string_view basic_str, const std::vector<node> &delta, const std::vector<node>::size_type index)
+    std::string merge_str(std::string_view basic_str, const std::vector<node> &delta)
     {
-        return {{}, {}, {}};
+        std::string merged_str{};
+        int i{0};
+        int j{0};
+        while (i < basic_str.size())
+        {
+            if (delta.empty())
+            {
+                merged_str += basic_str.substr(i);
+                break;
+            }
+            auto d{delta[j]};
+            ++j;
+            switch (d.type_)
+            {
+            case node_type::insert:
+                merged_str += basic_str.substr(i, d.low_ - i + 1);
+                merged_str += d.content_;
+                i = d.high_;
+                break;
+            case node_type::del:
+                merged_str += basic_str.substr(i, d.low_ - i);
+                i = d.high_ + 1;
+                break;
+            case node_type::replace:
+                merged_str += basic_str.substr(i, d.low_ - i);
+                merged_str += d.content_;
+                i = d.high_ + 1;
+                break;
+            default:
+                assert(false);
+                break;
+            }
+        }
+        return merged_str;
     }
 };

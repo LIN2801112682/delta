@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <regex>
+#include <string_view>
 
 namespace neu
 {
@@ -47,57 +48,50 @@ namespace neu
     {
         delta_vec_.emplace_back(delta);
         auto doc_id{delta_vec_.size() - 1};
-        for (std::vector<node>::size_type index{0}; index < delta.size(); ++index)
+        auto merged_str{merge_str(basic_str_, delta)};
+
+        offset_type begin, end;
+        bool is_find_begin{false};
+        for (size_t i{0}; i < merged_str.size(); ++i)
         {
-            auto &cur_node{delta[index]};
-            /*
-            switch (cur_node.type_)
+            const auto &ch{merged_str[i]};
+            if (ch != ' ')
             {
-            case node_type::insert:
-                merged_str += basic_str.substr(i, d.low_ - i + 1);
-                merged_str += d.content_;
-                i = d.high_;
-                break;
-            case node_type::del:
-                merged_str += basic_str.substr(i, d.low_ - i);
-                i = d.high_ + 1;
-                break;
-            case node_type::replace:
-                break; 
-            default:
-                assert(false);
-                break;
+                if (!is_find_begin)
+                {
+                    is_find_begin = true;
+                    begin = i;
+                }
+                end = i;
             }
-            */
-            auto [merged_str, left_index, _] = partial_merge_str(basic_str_, delta, index);
-            std::string token{};
-            offset_type offset{};
-            auto &doc_id_umap{inverted_index_[token]};
-            auto &offset_set{doc_id_umap[doc_id]};
-            offset_set.emplace(offset);
+            if (ch == ' ' || i == merged_str.size() - 1 && is_find_begin)
+            {
+                is_find_begin = false;
+                const auto &token = merged_str.substr(begin, end - begin + 1);
+
+                auto &doc_id_umap{inverted_index_[token]};
+                auto &offset_set{doc_id_umap[doc_id]};
+                offset_set.emplace(begin);
+            }
         }
     }
 
     std::vector<std::unordered_set<index_manager::offset_type>>
     index_manager::regex_query(const std::string &regex_str)
     {
+        std::vector<std::unordered_set<index_manager::offset_type>> result(inverted_index_.size());
         std::regex pattern{regex_str};
-        std::smatch result{};
-        for (const auto &[basic_token, offset_set] : basic_inverted_index_)
+        std::smatch match{};
+        for (const auto &[token, doc_id_umap] : inverted_index_)
         {
-            if (std::regex_match(basic_token, result, pattern))
+            if (std::regex_match(token, match, pattern))
             {
-
+                for (const auto &[doc_id, offset_set] : doc_id_umap)
+                {
+                    result[doc_id] = offset_set;
+                }
             }
         }
-
-        for (const auto &delta : delta_vec_)
-        {
-            for (std::vector<node>::size_type index{0}; index < delta.size(); ++index)
-            {
-
-            }
-        }
-        return {};
+        return result;
     }
 };
