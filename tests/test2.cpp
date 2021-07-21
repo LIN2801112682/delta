@@ -46,8 +46,9 @@ int main()
             std::vector<neu::node> vdelta{};
             while (!delta.empty())
             {
-                vdelta.emplace_back(delta.top());
+                auto d{delta.top()};
                 delta.pop();
+                vdelta.push_back(d);
             }
             delta_vec.emplace_back(vdelta);
         }

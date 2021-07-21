@@ -124,7 +124,7 @@ namespace neu
     {
         std::string merged_str{};
         int i{0};
-        while (i < basic_str.size())
+        while (i < basic_str.size() || !delta.empty())
         {
             if (delta.empty())
             {
@@ -154,6 +154,7 @@ namespace neu
                 break;
             }
         }
+
         return merged_str;
     }
 
@@ -162,7 +163,7 @@ namespace neu
         std::string merged_str{};
         int i{0};
         int j{0};
-        while (i < basic_str.size())
+        while (i < basic_str.size() || j < delta.size())
         {
             if (j == delta.size())
             {
