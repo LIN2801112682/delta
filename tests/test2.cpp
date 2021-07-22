@@ -1,13 +1,10 @@
 #include "neu/core.h"
-#include "neu/node.h"
 #include "neu/index_manager.h"
 #include "utils/scope_exit.hpp"
 #include <string>
-#include <fstream>
 #include <iostream>
-#include <bitset>
+#include <fstream>
 #include <algorithm>
-#include <numeric>
 
 static const std::string basic_file_path{"../resources/chr3.txt"};
 static const std::string log_file_path{"../resources/query2.txt"};
@@ -76,7 +73,6 @@ int main()
 #endif
 
             auto result{manager.regex_query(regex_str)};
-
             auto result_count{0};
             for (const auto &offset_uset : result)
             {
@@ -85,9 +81,7 @@ int main()
                     ++result_count;
                 }
             }
-#if 1
             std::cout << "result_count: " << result_count << '\n';
-#endif
         }
     }
 
