@@ -91,7 +91,10 @@ int main()
         int sum{0};
         for (const auto &offset_set : result)
         {
-            sum += offset_set.size();
+            if (!offset_set.empty())
+            {
+                ++sum;
+            }
         }
         auto end_time = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
