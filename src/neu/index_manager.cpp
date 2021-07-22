@@ -44,6 +44,22 @@ namespace neu
     {
     }
 
+    bool isSeparator(const char ch)
+    {
+        switch (ch)
+        {
+        case ' ':
+        case '.':
+        case '\'':
+        case '\"':
+        case '(':
+        case ')':
+            return true;
+        default:
+            return false;
+        }
+    }
+
     void
     index_manager::push_delta(const std::vector<node> &delta)
     {
@@ -56,7 +72,7 @@ namespace neu
         for (size_t i{0}; i < merged_str.size(); ++i)
         {
             const auto &ch{merged_str[i]};
-            if (ch != ' ' && ch != '\"' && ch != '.' && ch != '\'' && ch != '(' && ch != ')' )
+            if (!isSeparator(ch))
             {
                 if (!is_find_begin)
                 {
@@ -65,7 +81,7 @@ namespace neu
                 }
                 end = i;
             }
-            if (ch == ' ' || ch == '\"' || ch == '.' || ch == '\'' || ch == '(' || ch == ')' || i == merged_str.size() - 1 && is_find_begin)
+            if (isSeparator(ch) || i == merged_str.size() - 1 && is_find_begin)
             {
                 is_find_begin = false;
                 const auto &token = merged_str.substr(begin, end - begin + 1);
