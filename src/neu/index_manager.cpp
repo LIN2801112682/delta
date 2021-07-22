@@ -9,6 +9,23 @@
 
 namespace neu
 {
+    bool
+    isSeparator(const char ch)
+    {
+        switch (ch)
+        {
+        case ' ':
+        case '.':
+        case '\'':
+        case '\"':
+        case '(':
+        case ')':
+            return true;
+        default:
+            return false;
+        }
+    }
+
     auto
     init_basic_inverted_index(const std::string &basic_str)
     {
@@ -18,7 +35,7 @@ namespace neu
         for (index_manager::offset_type i{0}; i < basic_str.size(); ++i)
         {
             const auto &ch{basic_str[i]};
-            if (ch != ' ')
+            if (!isSeparator(ch))
             {
                 if (!is_find_begin)
                 {
@@ -27,7 +44,7 @@ namespace neu
                 }
                 end = i;
             }
-            if (ch == ' ' || i == basic_str.size() - 1 && is_find_begin)
+            if (isSeparator(ch) || i == basic_str.size() - 1 && is_find_begin)
             {
                 is_find_begin = false;
                 auto token{basic_str.substr(begin, end - begin + 1)};
@@ -42,22 +59,6 @@ namespace neu
         : basic_str_{basic_str},
           basic_inverted_index_{init_basic_inverted_index(basic_str)}
     {
-    }
-
-    bool isSeparator(const char ch)
-    {
-        switch (ch)
-        {
-        case ' ':
-        case '.':
-        case '\'':
-        case '\"':
-        case '(':
-        case ')':
-            return true;
-        default:
-            return false;
-        }
     }
 
     void
