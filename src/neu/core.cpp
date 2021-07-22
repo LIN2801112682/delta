@@ -120,7 +120,7 @@ namespace neu
         return delta;
     }
 
-    std::string merge_str(std::string_view basic_str, std::stack<node> &&delta)
+    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&delta)
     {
         std::string merged_str{};
         int i{0};

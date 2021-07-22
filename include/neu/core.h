@@ -10,7 +10,7 @@
 namespace neu
 {
     std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str);
-    std::string merge_str(std::string_view basic_str, std::stack<node> &&delta);
+    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&delta);
     std::string merge_str(std::string_view basic_str, const std::vector<node> &delta);
     std::tuple<std::string, std::vector<node>::size_type, std::vector<node>::size_type> partial_merge_str(std::string_view basic_str, const std::vector<node> &delta, const std::vector<node>::size_type index);
 };
