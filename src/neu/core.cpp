@@ -1,7 +1,4 @@
 #include "neu/core.h"
-#include <array>
-
-#define DEBUG_PRINT 0
 
 namespace neu
 {
@@ -158,7 +155,7 @@ namespace neu
         return merged_str;
     }
 
-    std::string merge_str(std::string_view basic_str, const std::vector<node> &delta)
+    std::string merge_str_by_delta(std::string_view basic_str, const std::vector<node> &delta)
     {
         std::string merged_str{};
         int i{0};

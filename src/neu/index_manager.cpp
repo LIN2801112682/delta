@@ -49,7 +49,7 @@ namespace neu
     {
         delta_vec_.emplace_back(delta);
         auto doc_id{delta_vec_.size() - 1};
-        auto merged_str{merge_str(basic_str_, delta)};
+        auto merged_str{merge_str_by_delta(basic_str_, delta)};
 
         offset_type begin, end;
         bool is_find_begin{false};
