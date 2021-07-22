@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <bitset>
+#include <algorithm>
 
 #define DEBUG_PRINT 0
 
@@ -24,6 +25,7 @@ int main()
         };
         getline(basic_ifs, basic_str);
     }
+    std::transform(std::begin(basic_str), std::end(basic_str), std::begin(basic_str), tolower);
 #if DEBUG_PRINT
     std::cout << "basic_str: " << basic_str << '\n';
 #endif
@@ -39,6 +41,7 @@ int main()
         std::string log_str{};
         while (getline(log_ifs, log_str))
         {
+            std::transform(std::begin(log_str), std::end(log_str), std::begin(log_str), tolower);
 #if DEBUG_PRINT
             std::cout << "log_str: " << log_str << '\n';
 #endif

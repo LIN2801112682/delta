@@ -20,7 +20,7 @@ namespace neu
         using inverted_index_type = std::unordered_map<std::string, std::unordered_map<doc_id_type, std::unordered_set<offset_type>>>;
         index_manager(const std::string &basic_str);
         void push_delta(const std::vector<node> &delta);
-        std::vector<std::unordered_set<offset_type>> regex_query(const std::string &regex_str);
+        std::vector<std::unordered_set<offset_type>> regex_query(std::string regex_str);
 
     private:
         const std::string basic_str_;
