@@ -40,7 +40,7 @@ namespace neu
 
     index_manager::index_manager(const std::string &basic_str)
         : basic_str_{basic_str},
-        basic_inverted_index_{init_basic_inverted_index(basic_str)}
+          basic_inverted_index_{init_basic_inverted_index(basic_str)}
     {
     }
 
@@ -78,10 +78,9 @@ namespace neu
     }
 
     std::vector<std::unordered_set<index_manager::offset_type>>
-    index_manager::regex_query(std::string regex_str)
+    index_manager::regex_query(const std::string &regex_str)
     {
         std::vector<std::unordered_set<index_manager::offset_type>> result(delta_vec_.size());
-        std::transform(std::begin(regex_str), std::end(regex_str), std::begin(regex_str), tolower);
         std::regex pattern{regex_str};
         std::smatch match{};
         for (const auto &[token, doc_id_umap] : inverted_index_)
