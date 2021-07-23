@@ -2,9 +2,10 @@
 
 namespace neu
 {
-    std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str)
+    std::stack<node>
+    backtracking_path(std::string_view basic_str, std::string_view log_str)
     {
-        std::stack<node> delta{};
+        std::stack<node> node_stack{};
         int m{static_cast<int>(basic_str.size())};
         int n{static_cast<int>(log_str.size())};
         int dp[m + 1][n + 1];
@@ -33,7 +34,7 @@ namespace neu
             }
         }
 
-#if DEBUG_PRINT
+#if 0
         std::cout << "distance: " << dp[m][n] << '\n';
 #endif
 
@@ -42,70 +43,70 @@ namespace neu
 
             if (n != 0 && dp[m][n - 1] + 1 == dp[m][n])
             {
-#if DEBUG_PRINT
+#if 0
                 std::cout << "insert: " << log_str[n - 1] << " at: " << m - 1 << '\n';
 #endif
                 node a{m - 1, m, node_type::insert, std::string{log_str[n - 1]}};
-                if (delta.empty())
+                if (node_stack.empty())
                 {
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 else
                 {
-                    node b{delta.top()};
+                    node b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ == b.low_)
                     {
                         a.content_ += b.content_;
-                        delta.pop();
+                        node_stack.pop();
                     }
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 --n;
                 continue;
             }
             else if (m != 0 && dp[m - 1][n] + 1 == dp[m][n])
             {
-#if DEBUG_PRINT
+#if 0
                 std::cout << "delete: " << basic_str[m - 1] << " at: " << m - 1 << '\n';
 #endif
-                node a{m - 1, m - 1, node_type::del, "-"};  // todo: tokenlize
-                if (delta.empty())
+                node a{m - 1, m - 1, node_type::del, ""};
+                if (node_stack.empty())
                 {
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 else
                 {
-                    node b{delta.top()};
+                    node b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ + 1 == b.low_)
                     {
                         a.high_ = b.high_;
-                        delta.pop();
+                        node_stack.pop();
                     }
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 --m;
                 continue;
             }
             else if (dp[m - 1][n - 1] + 1 == dp[m][n])
             {
-#if DEBUG_PRINT
+#if 0
                 std::cout << "replace: " << basic_str[m - 1] << " to: " << log_str[n - 1] << " at: " << m - 1 << '\n';
 #endif
                 node a{m - 1, m - 1, node_type::replace, std::string{log_str[n - 1]}};
-                if (delta.empty())
+                if (node_stack.empty())
                 {
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 else
                 {
-                    node b{delta.top()};
+                    node b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ + 1 == b.low_)
                     {
                         a.high_ = b.high_;
                         a.content_ += b.content_;
-                        delta.pop();
+                        node_stack.pop();
                     }
-                    delta.push(a);
+                    node_stack.push(a);
                 }
                 --m;
                 --n;
@@ -114,22 +115,22 @@ namespace neu
             --m;
             --n;
         }
-        return delta;
+        return node_stack;
     }
 
-    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&delta)
+    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&node_stack)
     {
         std::string merged_str{};
         int i{0};
-        while (i < basic_str.size() || !delta.empty())
+        while (i < basic_str.size() || !node_stack.empty())
         {
-            if (delta.empty())
+            if (node_stack.empty())
             {
                 merged_str += basic_str.substr(i);
                 break;
             }
-            auto d{delta.top()};
-            delta.pop();
+            auto d{node_stack.top()};
+            node_stack.pop();
             switch (d.type_)
             {
             case node_type::insert:
@@ -151,11 +152,10 @@ namespace neu
                 break;
             }
         }
-
         return merged_str;
     }
 
-    std::string merge_str_by_delta(std::string_view basic_str, const std::vector<node> &delta)
+    std::string merge_str_by_delta(std::string_view basic_str, const delta_type &delta)
     {
         std::string merged_str{};
         int i{0};

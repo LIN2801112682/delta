@@ -2,8 +2,6 @@
 #define _NEU_NODE_H_
 
 #include <string>
-#include <iostream>
-#include <unordered_map>
 
 namespace neu
 {

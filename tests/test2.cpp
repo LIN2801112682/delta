@@ -36,6 +36,7 @@ int main()
         };
 
         std::string log_str{};
+        neu::doc_id_type doc_id{1}; // from 1;
         while (getline(log_ifs, log_str))
         {
             std::transform(std::begin(log_str), std::end(log_str), std::begin(log_str), tolower);
@@ -53,7 +54,8 @@ int main()
                 delta.push_back(n);
             }
 
-            manager.push_delta(delta);
+            manager.add_delta(doc_id, delta);
+            ++doc_id;
         }
     }
 
@@ -73,14 +75,7 @@ int main()
 #endif
 
             auto result{manager.regex_query(regex_str)};
-            auto result_count{0};
-            for (const auto &offset_uset : result)
-            {
-                if (!offset_uset.empty())
-                {
-                    ++result_count;
-                }
-            }
+            auto result_count{result.size()};
             std::cout << "result_count: " << result_count << '\n';
         }
     }

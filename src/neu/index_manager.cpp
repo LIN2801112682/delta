@@ -9,7 +9,7 @@
 
 namespace neu
 {
-    bool
+    auto
     isSeparator(const char ch)
     {
         switch (ch)
@@ -29,10 +29,10 @@ namespace neu
     auto
     init_basic_inverted_index(const std::string &basic_str)
     {
-        index_manager::basic_inverted_index_type basic_inverted_index{};
-        index_manager::offset_type begin{0}, end{0};
+        basic_inverted_index_type basic_inverted_index{};
+        offset_type begin{0}, end{0};
         bool is_find_begin{false};
-        for (index_manager::offset_type i{0}; i < basic_str.size(); ++i)
+        for (offset_type i{0}; i < basic_str.size(); ++i)
         {
             const auto &ch{basic_str[i]};
             if (!isSeparator(ch))
@@ -62,54 +62,14 @@ namespace neu
     }
 
     void
-    index_manager::push_delta(const std::vector<node> &delta)
+    index_manager::add_delta(const doc_id_type doc_id, const delta_type &delta)
     {
-        delta_vec_.emplace_back(delta);
-        auto doc_id{delta_vec_.size() - 1};
-        auto merged_str{merge_str_by_delta(basic_str_, delta)};
-
-        offset_type begin, end;
-        bool is_find_begin{false};
-        for (size_t i{0}; i < merged_str.size(); ++i)
-        {
-            const auto &ch{merged_str[i]};
-            if (!isSeparator(ch))
-            {
-                if (!is_find_begin)
-                {
-                    is_find_begin = true;
-                    begin = i;
-                }
-                end = i;
-            }
-            if (isSeparator(ch) || i == merged_str.size() - 1 && is_find_begin)
-            {
-                is_find_begin = false;
-                const auto &token = merged_str.substr(begin, end - begin + 1);
-
-                auto &doc_id_umap{inverted_index_[token]};
-                auto &offset_set{doc_id_umap[doc_id]};
-                offset_set.emplace(begin);
-            }
-        }
+        delta_umap_.emplace(doc_id, delta);
     }
 
-    std::vector<std::unordered_set<index_manager::offset_type>>
+    std::unordered_map<doc_id_type, offset_uset_type>
     index_manager::regex_query(const std::string &regex_str)
     {
-        std::vector<std::unordered_set<index_manager::offset_type>> result(delta_vec_.size());
-        std::regex pattern{regex_str};
-        std::smatch match{};
-        for (const auto &[token, doc_id_umap] : inverted_index_)
-        {
-            if (regex_match(token, match, pattern))
-            {
-                for (const auto &[doc_id, offset_set] : doc_id_umap)
-                {
-                    result[doc_id] = offset_set;
-                }
-            }
-        }
-        return result;
+        return {};
     }
 };
