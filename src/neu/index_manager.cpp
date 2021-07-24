@@ -10,7 +10,7 @@
 namespace neu
 {
     auto
-    isSeparator(const char ch)
+    isSeparator(const ch_t ch)
     {
         switch (ch)
         {
@@ -26,15 +26,15 @@ namespace neu
         }
     }
 
-    auto
-    init_basic_inverted_index(const std::string &basic_str)
+    void
+    add_general_inverted_index(inverted_index_t &inverted_index, const doc_id_t doc_id, const str_t &str)
     {
-        basic_inverted_index_type basic_inverted_index{};
-        offset_type begin{0}, end{0};
+        position_t position{0};
+        str_idx_t begin, end;
         bool is_find_begin{false};
-        for (offset_type i{0}; i < basic_str.size(); ++i)
+        for (str_idx_t i{0}; i < str.size(); ++i)
         {
-            const auto &ch{basic_str[i]};
+            const ch_t &ch{str[i]};
             if (!isSeparator(ch))
             {
                 if (!is_find_begin)
@@ -44,71 +44,72 @@ namespace neu
                 }
                 end = i;
             }
-            if (isSeparator(ch) || i == basic_str.size() - 1 && is_find_begin)
+            if (isSeparator(ch) || i == str.size() - 1 && is_find_begin)
             {
                 is_find_begin = false;
-                auto token{basic_str.substr(begin, end - begin + 1)};
-                auto &offset_set{basic_inverted_index[token]};
-                offset_set.emplace(begin);
+                str_t token{str.substr(begin, end - begin + 1)};
+
+                auto &doc_id_map{inverted_index[token]};
+                auto &position_offset_vec{doc_id_map[doc_id]};
+
+                position_offset_vec.emplace_back(
+                    position_offset_t{
+                        position++,
+                        offset_t{
+                            begin,
+                            end,
+                        }});
             }
         }
-        return basic_inverted_index;
     }
 
-    index_manager::index_manager(const std::string &basic_str)
-        : basic_str_{basic_str},
-          basic_inverted_index_{init_basic_inverted_index(basic_str)}
+    index_manager::index_manager(const str_t &basic_str)
+        : basic_str_{basic_str}
     {
+        add_general_inverted_index(basic_inverted_index_, k_basic_doc_id, basic_str_);
     }
 
     void
-    index_manager::add_delta(const doc_id_type doc_id, const delta_type &delta)
+    index_manager::add_delta_invert_index(const doc_id_t doc_id, const delta_type &delta)
     {
-        delta_umap_.emplace(doc_id, delta);
         auto merged_str{merge_str_by_delta(basic_str_, delta)};
-
-        offset_type begin{0}, end{0};
-        bool is_find_begin{false};
-        for (size_t i{0}; i < merged_str.size(); ++i)
-        {
-            const auto &ch{merged_str[i]};
-            if (!isSeparator(ch))
-            {
-                if (!is_find_begin)
-                {
-                    is_find_begin = true;
-                    begin = i;
-                }
-                end = i;
-            }
-            if (isSeparator(ch) || i == merged_str.size() - 1 && is_find_begin)
-            {
-                is_find_begin = false;
-                const auto &token = merged_str.substr(begin, end - begin + 1);
-
-                auto &doc_id_umap{inverted_index_[token]};
-                auto &offset_set{doc_id_umap[doc_id]};
-                offset_set.emplace(begin);
-            }
-        }
+        add_general_inverted_index(delta_inverted_index_, doc_id, merged_str);
     }
 
-    std::unordered_map<doc_id_type, offset_uset_type>
-    index_manager::regex_query(const std::string &regex_str)
+    void
+    index_manager::add_native_inverted_index(const doc_id_t doc_id, const str_t &native_str)
     {
-        std::unordered_map<doc_id_type, offset_uset_type> result;
+        add_general_inverted_index(native_inverted_index_, doc_id, native_str);
+    }
+
+    auto
+    regex_query_general_invert_index(const inverted_index_t &inverted_index, const str_t &regex_str)
+    {
+        doc_id_uset_t result{};
         std::regex pattern{regex_str};
-        std::smatch match{};
-        for (const auto &[token, doc_id_umap] : inverted_index_)
+        std::smatch regex_result;
+        for (const auto &[token, doc_id_umap] : inverted_index)
         {
-            if (regex_match(token, match, pattern))
+            if (regex_match(token, regex_result, pattern))
             {
-                for (const auto &[doc_id, offset_set] : doc_id_umap)
+                for (const auto &[doc_id, _] : doc_id_umap)
                 {
-                    result[doc_id] = offset_set;
+                    result.emplace(doc_id);
                 }
             }
         }
         return result;
+    }
+
+    doc_id_uset_t
+    index_manager::regex_query_delta_invert_index(const str_t &regex_str)
+    {
+        return regex_query_general_invert_index(delta_inverted_index_, regex_str);
+    }
+
+    doc_id_uset_t
+    index_manager::regex_query_native_invert_index(const str_t &regex_str)
+    {
+        return regex_query_general_invert_index(native_inverted_index_, regex_str);
     }
 };

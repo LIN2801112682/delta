@@ -3,6 +3,7 @@
 
 #include "neu/core.h"
 #include <string>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -10,24 +11,47 @@
 
 namespace neu
 {
-    using doc_id_type = std::size_t;
-    using offset_type = std::string::size_type;
-    using offset_uset_type = std::unordered_set<offset_type>;
-    using basic_inverted_index_type = std::unordered_map<std::string, offset_uset_type>;
-    using inverted_index_type = std::unordered_map<std::string, std::unordered_map<doc_id_type, offset_uset_type>>;
+    using str_t = std::string; //str = string
+    using ch_t = str_t::value_type; // ch = char
+    using doc_t = std::vector<str_t>; //doc = document
+    using col_t = std::vector<doc_t>; // col = collection
+    using doc_id_t = col_t::size_type;
+    using position_t = doc_t::size_type;
+    using str_idx_t = str_t::size_type; 
+
+    struct offset_t
+    {
+        str_idx_t begin;
+        str_idx_t end;
+    };
+
+    struct position_offset_t
+    {
+        position_t position;
+        offset_t offset;
+    };
+    using position_offset_vec_t = std::vector<position_offset_t>;
+    using doc_id_umap_t = std::unordered_map<doc_id_t, position_offset_vec_t>;
+    using inverted_index_t = std::unordered_map<str_t, doc_id_umap_t>;
+
+    using doc_id_uset_t = std::unordered_set<doc_id_t>;
+
+    constexpr doc_id_t k_basic_doc_id{0};
 
     class index_manager
     {
     public:
-        index_manager(const std::string &basic_str);
-        void add_delta(const doc_id_type doc_id, const delta_type &delta);
-        std::unordered_map<doc_id_type, offset_uset_type> regex_query(const std::string &regex_str);
+        index_manager(const str_t &basic_str);
+        void add_delta_invert_index(const doc_id_t doc_id, const delta_type &delta);
+        void add_native_inverted_index(const doc_id_t doc_id, const str_t &native_str);
+        doc_id_uset_t regex_query_delta_invert_index(const str_t &regex_str);
+        doc_id_uset_t regex_query_native_invert_index(const str_t &regex_str);
 
     private:
-        const std::string basic_str_;
-        const basic_inverted_index_type basic_inverted_index_;
-        std::unordered_map<doc_id_type, delta_type> delta_umap_{};
-        inverted_index_type inverted_index_{};
+        const str_t basic_str_;
+        inverted_index_t basic_inverted_index_{};
+        inverted_index_t delta_inverted_index_{};
+        inverted_index_t native_inverted_index_{};
     };
 };
 

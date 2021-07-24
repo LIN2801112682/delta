@@ -5,7 +5,7 @@
 #include <fstream>
 
 static const std::string basic_file_path{"../resources/chr0716.txt"};
-static const std::string log_file_path{"../resources/query.txt"};
+static const std::string native_file_path{"../resources/query.txt"};
 
 int main()
 {
@@ -24,7 +24,7 @@ int main()
     }
 
     {
-        std::ifstream log_ifs{log_file_path, std::ios::in};
+        std::ifstream log_ifs{native_file_path, std::ios::in};
         SCOPE_GUARD
         {
             log_ifs.close();
