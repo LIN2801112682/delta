@@ -36,7 +36,7 @@ namespace neu
 
     using doc_id_uset_t = std::unordered_set<doc_id_t>;
 
-    constexpr doc_id_t k_basic_doc_id{0};
+    static constexpr doc_id_t k_basic_doc_id{0};
 
     class index_manager
     {

@@ -24,25 +24,25 @@ int main()
     }
 
     {
-        std::ifstream log_ifs{native_file_path, std::ios::in};
+        std::ifstream native_ifs{native_file_path, std::ios::in};
         SCOPE_GUARD
         {
-            log_ifs.close();
+            native_ifs.close();
         };
 
-        std::string log_str{};
-        while (getline(log_ifs, log_str))
+        std::string native_str{};
+        while (getline(native_ifs, native_str))
         {
 #if 0
-            std::cout << "log_str: " << log_str << '\n';
+            std::cout << "native_str: " << native_str << '\n';
 #endif
 
-            auto node_stack{neu::backtracking_path(basic_str, log_str)};
+            auto node_stack{neu::backtracking_path(basic_str, native_str)};
             auto merged_str{neu::merge_str_by_node_stack(basic_str, std::move(node_stack))};
 #if 0
             std::cout << "merged_str: " << merged_str << '\n';
 #endif
-            if (merged_str == log_str)
+            if (merged_str == native_str)
             {
                 std::cout << "merge correct\n";
             }
