@@ -48,12 +48,17 @@ namespace neu
         std::cout << "basic_str: " << basic_str_ << '\n';
         auto merged_str{neu::merge_str_by_delta(basic_str_, delta)};
         std::cout << "merged_str: " << merged_str << '\n';
-        // 取正中间
+
         for (int mid{0}; mid < delta.size(); ++mid)
         {
             const auto &node{delta[mid]};
             str_t partial_merged_str{};
-            offset_t native_left_right_offset{0}, basic_left_left_offset{0}, basic_left_right_offset{0}, basic_right_left_offset{0}, basic_right_right_offset{0}; 
+            int left{mid - 1}, right{mid + 1};
+            offset_t native_left_right_offset{0};
+            offset_t basic_left_left_offset{0};
+            offset_t basic_left_right_offset{0};
+            offset_t basic_right_left_offset{0};
+            offset_t basic_right_right_offset{0}; 
             auto has_left_split{false}, has_right_split{false};
 
             switch (node.type_)
@@ -84,179 +89,221 @@ namespace neu
                 break;
             }
 
-            // 往左看
-            for (int left{mid - 1}; !has_left_split && 0 <= left; --left)
+            while (!has_left_split)
             {
-                const auto &left_node{delta[left]};
-                switch (left_node.type_)
+                if (0 <= left)
                 {
-                case node_type_enum::insert:
-                    basic_left_left_offset = left_node.high_;
-                    break;
-                case node_type_enum::deletE:
-                    basic_left_left_offset = left_node.high_ + 1;
-                    break;
-                case node_type_enum::replace:
-                    basic_left_left_offset = left_node.high_ + 1;
-                    break;
-                default:
-                    std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
-                    break;
-                }
-
-                // 从左扫描没有被修改过的片段
-                for (offset_t i{0}; basic_left_left_offset <= basic_left_right_offset - i; ++i)
-                {
-                    const ch_t &ch{basic_str_[basic_left_right_offset - i]};
-                    // 截断
-                    if (is_separator(ch))
+                    const auto &left_node{delta[left]};
+                    switch (left_node.type_)
                     {
-                        has_left_split = true;
-                        partial_merged_str = basic_str_.substr(basic_left_right_offset - i + 1, i) + partial_merged_str;
-                        native_left_right_offset -= (i - 1);
+                    case node_type_enum::insert:
+                        basic_left_left_offset = left_node.high_;
+                        break;
+                    case node_type_enum::deletE:
+                        basic_left_left_offset = left_node.high_ + 1;
+                        break;
+                    case node_type_enum::replace:
+                        basic_left_left_offset = left_node.high_ + 1;
+                        break;
+                    default:
+                        std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
                         break;
                     }
                 }
-                if (has_left_split)
+                else
                 {
-                    break;
-                }
-                if (basic_left_left_offset <= basic_left_right_offset)
-                {
-                    partial_merged_str = basic_str_.substr(basic_left_right_offset, basic_left_right_offset - basic_left_left_offset + 1) + partial_merged_str;
+                    basic_left_left_offset = 0;
                 }
 
-                // 从左扫描左边的 delta 的片段
-                switch (left_node.type_)
+                if (basic_left_left_offset <= basic_left_right_offset)
                 {
-                case node_type_enum::insert:
-                    native_left_right_offset = left_node.native_left_right_offset_;
-                    for (offset_t i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
+                    for (offset_t i{0}; basic_left_left_offset + i <= basic_left_right_offset; ++i)
                     {
-                        const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
+                        const ch_t &ch{basic_str_[basic_left_right_offset - i]};
                         if (is_separator(ch))
                         {
                             has_left_split = true;
-                            partial_merged_str = left_node.content_.substr(left_node.content_.size() - i, i) + partial_merged_str;
-                            native_left_right_offset -= (i - 1);
+                            partial_merged_str = basic_str_.substr(basic_left_right_offset - i + 1, i) + partial_merged_str;
+                            native_left_right_offset += (i - 1);
                             break;
                         }
                     }
-                    basic_left_right_offset = left_node.low_;
-                    break;
-                case node_type_enum::deletE:
-                    native_left_right_offset = left_node.native_left_right_offset_;
-                    basic_left_right_offset = left_node.low_ - 1;
-                    break;
-                case node_type_enum::replace:
-                    native_left_right_offset = left_node.native_left_right_offset_;
-                    for (offset_t i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
+                    if (has_left_split)
                     {
-                        const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
-                        if (is_separator(ch))
+                        break;
+                    }
+                    partial_merged_str = basic_str_.substr(basic_left_left_offset, basic_left_right_offset - basic_left_left_offset + 1) + partial_merged_str;
+                }
+
+                if (0 <= left)
+                {
+                    const auto &left_node{delta[left]};
+                    switch (left_node.type_)
+                    {
+                    case node_type_enum::insert:
+                        native_left_right_offset = left_node.native_left_right_offset_;
+                        for (offset_t i{0}; i <= left_node.content_.size() - 1; ++i)
                         {
-                            has_left_split = true;
-                            partial_merged_str = left_node.content_.substr(left_node.content_.size() - i, i) + partial_merged_str;
-                            native_left_right_offset -= (i - 1);
+                            const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
+                            if (is_separator(ch))
+                            {
+                                has_left_split = true;
+                                partial_merged_str = left_node.content_.substr(left_node.content_.size() - i, i) + partial_merged_str;
+                                native_left_right_offset += (left_node.content_.size() - i);
+                                break;
+                            }
+                        }
+                        if (has_left_split)
+                        {
                             break;
                         }
+                        partial_merged_str = left_node.content_ + partial_merged_str;
+                        basic_left_right_offset = left_node.low_;
+                        break;
+                    case node_type_enum::deletE:
+                        native_left_right_offset = left_node.native_left_right_offset_;
+                        basic_left_right_offset = left_node.low_ - 1;
+                        break;
+                    case node_type_enum::replace:
+                        native_left_right_offset = left_node.native_left_right_offset_;
+                        for (offset_t i{0}; i <= left_node.content_.size() - 1; ++i)
+                        {
+                            if (i > 50)
+                            {
+                                std::cout << "          i: " << left_node.content_.size() - 1 - i << '\n';
+                            }
+                            const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
+                            if (is_separator(ch))
+                            {
+                                has_left_split = true;
+                                partial_merged_str = left_node.content_.substr(left_node.content_.size() - i, i) + partial_merged_str;
+                                native_left_right_offset += (left_node.content_.size() - i);
+                                break;
+                            }
+                        }
+                        if (has_left_split)
+                        {
+                            break;
+                        }
+                        partial_merged_str = left_node.content_ + partial_merged_str;
+                        basic_left_right_offset = left_node.low_ - 1;
+                        break;
+                    default:
+                        std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
+                        break;
                     }
-                    basic_left_right_offset = left_node.low_ - 1;
-                    break;
-                default:
-                    std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
+                    --left;
+                }
+                else
+                {
+                    has_left_split = true;
+                    native_left_right_offset = -1;
                     break;
                 }
             }
 
-            // 往右看
-            for (int right{mid + 1}; !has_right_split && right <= delta.size() - 1; ++right)
+            while (!has_right_split)
             {
-                const auto &right_node{delta[right]};
-                switch (right_node.type_)
+                if (right <= delta.size() - 1)
                 {
-                case node_type_enum::insert:
-                    basic_right_right_offset = right_node.low_;
-                    break;
-                case node_type_enum::deletE:
-                    basic_right_right_offset = right_node.low_ - 1;
-                    break;
-                case node_type_enum::replace:
-                    basic_right_right_offset = right_node.low_ - 1;
-                    break;
-                default:
-                    std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
-                    break;
-                }
-
-                // 从右扫描没有被修改过的片段
-                for (offset_t i{0}; basic_right_left_offset + i <= basic_right_right_offset; ++i)
-                {
-                    const ch_t &ch{basic_str_[basic_right_left_offset + i]};
-                    // 截断
-                    if (is_separator(ch))
+                    const auto &right_node{delta[right]};
+                    switch (right_node.type_)
                     {
-                        has_right_split = true;
-                        partial_merged_str += basic_str_.substr(basic_right_left_offset, i);
+                    case node_type_enum::insert:
+                        basic_right_right_offset = right_node.low_;
+                        break;
+                    case node_type_enum::deletE:
+                        basic_right_right_offset = right_node.low_ - 1;
+                        break;
+                    case node_type_enum::replace:
+                        basic_right_right_offset = right_node.low_ - 1;
+                        break;
+                    default:
+                        std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
                         break;
                     }
                 }
-                if (has_right_split)
+                else
                 {
-                    break;
+                    basic_right_right_offset = basic_str_.size() - 1;
                 }
+
                 if (basic_right_left_offset <= basic_right_right_offset)
                 {
+                    for (offset_t i{0}; basic_right_left_offset + i <= basic_right_right_offset; ++i)
+                    {
+                        const ch_t &ch{basic_str_[basic_right_left_offset + i]};
+                        if (is_separator(ch))
+                        {
+                            has_right_split = true;
+                            partial_merged_str += basic_str_.substr(basic_right_left_offset + i - 1, i);
+                            break;
+                        }
+                    }
+                    if (has_right_split)
+                    {
+                        break;
+                    }
                     partial_merged_str += basic_str_.substr(basic_right_left_offset, basic_right_right_offset - basic_right_left_offset + 1);
                 }
 
-                // 从右扫描右边的 delta 的片段
-                switch (right_node.type_)
+                if (right <= delta.size() - 1)
                 {
-                case node_type_enum::insert:
-                    for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
+                    const auto &right_node{delta[right]};
+                    switch (right_node.type_)
                     {
-                        const ch_t &ch{right_node.content_[i]};
-                        if (is_separator(ch))
+                    case node_type_enum::insert:
+                        for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                         {
-                            has_right_split = true;
-                            partial_merged_str += right_node.content_.substr(0, i);
+                            const ch_t &ch{right_node.content_[i]};
+                            if (is_separator(ch))
+                            {
+                                has_right_split = true;
+                                partial_merged_str += right_node.content_.substr(0, i);
+                                break;
+                            }
+                        }
+                        if (has_right_split)
+                        {
                             break;
                         }
-                    }
-                    if (has_right_split)
-                    {
+                        partial_merged_str += right_node.content_;
+                        basic_right_left_offset = right_node.high_;
                         break;
-                    }
-                    partial_merged_str += right_node.content_;
-                    basic_right_left_offset = right_node.high_;
-                    break;
-                case node_type_enum::deletE:
-                    basic_right_left_offset = right_node.high_ + 1;
-                    break;
-                case node_type_enum::replace:
-                    for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
-                    {
-                        const ch_t &ch{right_node.content_[i]};
-                        if (is_separator(ch))
+                    case node_type_enum::deletE:
+                        basic_right_left_offset = right_node.high_ + 1;
+                        break;
+                    case node_type_enum::replace:
+                        for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                         {
-                            has_right_split = true;
-                            partial_merged_str += right_node.content_.substr(0, i);
+                            const ch_t &ch{right_node.content_[i]};
+                            if (is_separator(ch))
+                            {
+                                has_right_split = true;
+                                partial_merged_str += right_node.content_.substr(0, i);
+                                break;
+                            }
+                        }
+                        if (has_right_split)
+                        {
                             break;
                         }
-                    }
-                    if (has_right_split)
-                    {
+                        partial_merged_str += right_node.content_;
+                        basic_right_left_offset = right_node.high_ + 1;
+                        break;
+                    default:
+                        std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
                         break;
                     }
-                    partial_merged_str += right_node.content_;
-                    basic_right_left_offset = right_node.high_ + 1;
-                    break;
-                default:
-                    std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
+                    ++right;
+                }
+                else
+                {
+                    has_right_split = true;
                     break;
                 }
             }
+
             std::cout << "  mid: " << mid << " partial_merged_str: " << partial_merged_str << '\n';
         }
     }
