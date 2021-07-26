@@ -1,4 +1,5 @@
 #include "neu/core.h"
+#include <limits>
 #include <iostream>
 
 namespace neu
@@ -7,9 +8,9 @@ namespace neu
     extract_node_stack(str_v_t basic_str, str_v_t native_str)
     {
         node_stack_t node_stack{};
-        int m{static_cast<int>(basic_str.size())};
-        int n{static_cast<int>(native_str.size())};
-        std::vector<std::vector<offset_t>> dp(m + 1, std::vector<offset_t>(n + 1, 0));
+        auto basic_str_size{basic_str.size()};
+        auto native_str_size{native_str.size()};
+        std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
         for (offset_t offset{0}; offset < dp.size(); ++offset)
         {
             dp[offset][0] = offset;
@@ -39,20 +40,26 @@ namespace neu
         }
 
 #if 0
-        std::cout << "distance: " << dp[m][n] << '\n';
+        std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
 #endif
-
-        while (m >= 0 && n >= 0)
+        auto basic_str_offset{basic_str_size};
+        auto native_str_offset{native_str_size};
+        /*
+        if (offset_t == signed) offset > 0
+        if (offset_t == unsigned) offset != max
+        */
+        while (basic_str_offset != (std::numeric_limits<offset_t>::max)() && native_str_offset != (std::numeric_limits<offset_t>::max)())
         {
-            if (n > 0 && dp[m][n - 1] + 1 == dp[m][n])
+            if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "insert: " << native_str[n - 1] << " at: " << m - 1 << '\n';
+                std::cout << "insert: " << native_str[native_str_offset - 1]
+                    << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
-                    .content_ = str_t{native_str[n - 1]},
-                    .low_ = static_cast<offset_t>(m - 1),
-                    .high_ = static_cast<offset_t>(m),
+                    .content_ = str_t{native_str[native_str_offset - 1]},
+                    .low_ = basic_str_offset - 1,
+                    .high_ = basic_str_offset,
                     .type_ = node_type_enum::insert,
                 };
                 if (node_stack.empty())
@@ -69,18 +76,19 @@ namespace neu
                     }
                     node_stack.push(node);
                 }
-                --n;
+                --native_str_offset;
                 continue;
             }
-            else if (m > 0 && dp[m - 1][n] + 1 == dp[m][n])
+            else if (basic_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "delete: " << basic_str[m - 1] << " at: " << m - 1 << '\n';
+                std::cout << "delete: " << basic_str[basic_str_offset - 1]
+                    << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
                     .content_ = {},
-                    .low_ = static_cast<offset_t>(m - 1),
-                    .high_ = static_cast<offset_t>(m - 1),
+                    .low_ = basic_str_offset - 1,
+                    .high_ = basic_str_offset - 1,
                     .type_ = node_type_enum::deletE,
                 };
                 if (node_stack.empty())
@@ -97,18 +105,20 @@ namespace neu
                     }
                     node_stack.push(node);
                 }
-                --m;
+                --basic_str_offset;
                 continue;
             }
-            else if (m > 0 && n > 0 && dp[m - 1][n - 1] + 1 == dp[m][n])
+            else if (basic_str_offset > 0 && native_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "replace: " << basic_str[m - 1] << " to: " << native_str[n - 1] << " at: " << m - 1 << '\n';
+                std::cout << "replace: " << basic_str[basic_str_offset - 1]
+                    << " to: " << native_str[native_str_offset - 1]
+                    << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
-                    .content_ = str_t{native_str[n - 1]},
-                    .low_ = static_cast<offset_t>(m - 1),
-                    .high_ = static_cast<offset_t>(m - 1),
+                    .content_ = str_t{native_str[native_str_offset - 1]},
+                    .low_ = basic_str_offset - 1,
+                    .high_ = basic_str_offset - 1,
                     .type_ = node_type_enum::replace,
                 };
                 if (node_stack.empty())
@@ -126,12 +136,12 @@ namespace neu
                     }
                     node_stack.push(node);
                 }
-                --m;
-                --n;
+                --basic_str_offset;
+                --native_str_offset;
                 continue;
             }
-            --m;
-            --n;
+            --basic_str_offset;
+            --native_str_offset;
         }
         return node_stack;
     }
@@ -167,7 +177,7 @@ namespace neu
                 offset = node.high_ + 1;
                 break;
             default:
-                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n'; 
+                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
                 break;
             }
         }
@@ -179,16 +189,16 @@ namespace neu
     {
         str_t merged_str{};
         offset_t offset{0};
-        delta_t::size_type i{0};
-        while (offset < basic_str.size() || i < delta.size())
+        delta_t::size_type delta_idx{0};
+        while (offset < basic_str.size() || delta_idx < delta.size())
         {
-            if (i == delta.size())
+            if (delta_idx == delta.size())
             {
                 merged_str += basic_str.substr(offset);
                 break;
             }
-            auto node{delta[i]};
-            ++i;
+            auto node{delta[delta_idx]};
+            ++delta_idx;
             switch (node.type_)
             {
             case node_type_enum::insert:
@@ -206,7 +216,7 @@ namespace neu
                 offset = node.high_ + 1;
                 break;
             default:
-                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n'; 
+                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
                 break;
             }
         }
