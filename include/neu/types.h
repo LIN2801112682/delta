@@ -39,7 +39,7 @@ namespace neu
 
     using off_uset_t = std::unordered_set<offset_t>;
     using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
-    using index_t = std::unordered_map<str_t, doc_id_umap_t>;
+    using inverted_index_t = std::unordered_map<str_t, doc_id_umap_t>;
 };
 
 #endif

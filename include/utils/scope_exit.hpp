@@ -1,3 +1,6 @@
+#ifndef _UTILS_SCOPE_EXIT_HPP_
+#define _UTILS_SCOPE_EXIT_HPP_
+
 #include <functional>
 
 class ScopeExit
@@ -32,3 +35,5 @@ private:
 
 #undef SCOPE_GUARD
 #define SCOPE_GUARD _MAKE_SCOPE_(__LINE__)
+
+#endif

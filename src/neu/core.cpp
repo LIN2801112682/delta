@@ -60,6 +60,7 @@ namespace neu
                     .content_ = str_t{native_str[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset,
+                    .native_str_offset_ = native_str_offset - 2,
                     .type_ = node_type_enum::insert,
                 };
                 if (node_stack.empty())
@@ -89,6 +90,7 @@ namespace neu
                     .content_ = {},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset - 1,
+                    .native_str_offset_ = native_str_offset - 1,
                     .type_ = node_type_enum::deletE,
                 };
                 if (node_stack.empty())
@@ -119,6 +121,7 @@ namespace neu
                     .content_ = str_t{native_str[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset - 1,
+                    .native_str_offset_ = native_str_offset - 2,
                     .type_ = node_type_enum::replace,
                 };
                 if (node_stack.empty())
