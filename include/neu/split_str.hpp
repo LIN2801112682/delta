@@ -44,7 +44,7 @@ namespace neu
         void do_get_next()
         {
             offset_t begin{0}, end{0};
-            bool is_find_begin{false};
+            auto is_find_begin{false};
             for (; offset_ < str_.size(); ++offset_)
             {
                 const ch_t &ch{str_[offset_]};

@@ -7,8 +7,7 @@ namespace neu
     extract_node_stack(str_v_t basic_str, str_v_t native_str)
     {
         node_stack_t node_stack{};
-        auto basic_str_size{basic_str.size()};
-        auto native_str_size{native_str.size()};
+        auto basic_str_size{basic_str.size()}, native_str_size{native_str.size()};
         std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
         for (offset_t offset{0}; offset < dp.size(); ++offset)
         {
@@ -41,8 +40,7 @@ namespace neu
 #if 0
         std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
 #endif
-        auto basic_str_offset{basic_str_size};
-        auto native_str_offset{native_str_size};
+        auto basic_str_offset{basic_str_size}, native_str_offset{native_str_size};
         /*
         if (offset_t == signed) offset >= 0
         if (offset_t == unsigned) offset != offset_t::max
@@ -59,7 +57,7 @@ namespace neu
                     .content_ = str_t{native_str[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset,
-                    .native_offset_ = native_str_offset - 1,
+                    .native_left_right_offset_ = native_str_offset - 2,
                     .type_ = node_type_enum::insert,
                 };
                 if (node_stack.empty())
@@ -89,7 +87,7 @@ namespace neu
                     .content_ = {},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset - 1,
-                    .native_offset_ = native_str_offset - 1,
+                    .native_left_right_offset_ = native_str_offset - 1,
                     .type_ = node_type_enum::deletE,
                 };
                 if (node_stack.empty())
@@ -120,7 +118,7 @@ namespace neu
                     .content_ = str_t{native_str[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset - 1,
-                    .native_offset_ = native_str_offset - 1,
+                    .native_left_right_offset_ = native_str_offset - 2,
                     .type_ = node_type_enum::replace,
                 };
                 if (node_stack.empty())
