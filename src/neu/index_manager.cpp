@@ -1,11 +1,7 @@
 #include "neu/index_manager.h"
-
-#include "neu/core.h"
-
+#include <functional>
 #include <sstream>
 #include <regex>
-#include <string_view>
-#include <algorithm>
 
 namespace neu
 {
@@ -27,7 +23,7 @@ namespace neu
     }
 
     void
-    split_str(str_v_t str)
+    split_str(str_v_t str,  std::function<bool (const ch_t ch)> isSeparator)
     {
         offset_t begin{0}, end{0};
         bool is_find_begin{false};
@@ -47,17 +43,7 @@ namespace neu
             {
                 is_find_begin = false;
                 str_t token{str.substr(begin, end - begin + 1)};
-
-                auto &doc_id_map{inverted_index[token]};
-                auto &position_offset_vec{doc_id_map[doc_id]};
-
-                position_offset_vec.emplace_back(
-                    position_offset_t{
-                        position++,
-                        offset_t{
-                            begin,
-                            end,
-                        }});
+                //return token, begin
             }
         }
     }

@@ -46,14 +46,7 @@ int main()
 #endif
 
             auto node_stack{neu::extract_node_stack(basic_str, native_str)};
-            std::vector<neu::node_t> delta{};
-            while (!node_stack.empty())
-            {
-                auto &n{node_stack.top()};
-                node_stack.pop();
-                delta.push_back(n);
-            }
-
+            auto delta{neu::node_stack_to_delta(std::move(node_stack))};
             ++doc_id;
             manager.add_index(doc_id, delta);
         }
