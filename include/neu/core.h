@@ -1,18 +1,13 @@
 #ifndef _NEU_CORE_H_
 #define _NEU_CORE_H_
 
-#include "neu/node.h"
-#include <string_view>
-#include <stack>
-#include <vector>
+#include "neu/types.h"
 
 namespace neu
 {
-    using delta_type = std::vector<node>;
-
-    std::stack<node> backtracking_path(std::string_view basic_str, std::string_view log_str);
-    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&node_stack);
-    std::string merge_str_by_delta(std::string_view basic_str, const delta_type &delta);
+    node_stack_t extract_node_stack(str_v_t basic_str, str_v_t native_str);
+    str_t merge_str_by_node_stack(str_v_t basic_str, node_stack_t &&node_stack);
+    str_t merge_str_by_delta(str_v_t basic_str, const delta_t &delta);
 };
 
 #endif

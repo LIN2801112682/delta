@@ -1,29 +1,29 @@
 #include "neu/core.h"
+#include <iostream>
 
 namespace neu
 {
-    std::stack<node>
-    backtracking_path(std::string_view basic_str, std::string_view log_str)
+    node_stack_t
+    extract_node_stack(str_v_t basic_str, str_v_t native_str)
     {
-        std::stack<node> node_stack{};
-        int m{static_cast<int>(basic_str.size())};
-        int n{static_cast<int>(log_str.size())};
-        int dp[m + 1][n + 1];
+        node_stack_t node_stack{};
+        auto m{basic_str.size()};
+        auto n{native_str.size()};
+        std::vector<std::vector<offset_t>> dp(m + 1, std::vector<offset_t>(n + 1, 0));
 
-        for (int i{0}; i < m + 1; ++i)
+        for (offset_t i{0}; i < m + 1; ++i)
         {
             dp[i][0] = i;
         }
-        for (int i{0}; i < n + 1; ++i)
+        for (offset_t i{0}; i < n + 1; ++i)
         {
             dp[0][i] = i;
         }
-
-        for (int i{1}; i < m + 1; ++i)
+        for (offset_t i{1}; i < m + 1; ++i)
         {
-            for (int j{1}; j < n + 1; ++j)
+            for (offset_t j{1}; j < n + 1; ++j)
             {
-                if (basic_str[i - 1] == log_str[j - 1])
+                if (basic_str[i - 1] == native_str[j - 1])
                 {
                     dp[i][j] = dp[i - 1][j - 1];
                 }
@@ -44,16 +44,20 @@ namespace neu
             if (n != 0 && dp[m][n - 1] + 1 == dp[m][n])
             {
 #if 0
-                std::cout << "insert: " << log_str[n - 1] << " at: " << m - 1 << '\n';
+                std::cout << "insert: " << native_str[n - 1] << " at: " << m - 1 << '\n';
 #endif
-                node a{m - 1, m, node_type::insert, std::string{log_str[n - 1]}};
+                node_t a{
+                    .content_ = {native_str[n - 1]},
+                    .low_ = m - 1,
+                    .high_ = m,
+                    .type_ = node_type_enum::insert};
                 if (node_stack.empty())
                 {
                     node_stack.push(a);
                 }
                 else
                 {
-                    node b{node_stack.top()};
+                    node_t b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ == b.low_)
                     {
                         a.content_ += b.content_;
@@ -67,16 +71,20 @@ namespace neu
             else if (m != 0 && dp[m - 1][n] + 1 == dp[m][n])
             {
 #if 0
-                std::cout << "delete: " << basic_str[m - 1] << " at: " << m - 1 << '\n';
+                std::cout << "delete: " << native_str[m - 1] << " at: " << m - 1 << '\n';
 #endif
-                node a{m - 1, m - 1, node_type::del, ""};
+                node_t a{
+                    .content_ = {},
+                    .low_ = m - 1,
+                    .high_ = m - 1,
+                    .type_ = node_type_enum::deletE};
                 if (node_stack.empty())
                 {
                     node_stack.push(a);
                 }
                 else
                 {
-                    node b{node_stack.top()};
+                    node_t b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ + 1 == b.low_)
                     {
                         a.high_ = b.high_;
@@ -90,16 +98,20 @@ namespace neu
             else if (dp[m - 1][n - 1] + 1 == dp[m][n])
             {
 #if 0
-                std::cout << "replace: " << basic_str[m - 1] << " to: " << log_str[n - 1] << " at: " << m - 1 << '\n';
+                std::cout << "replace: " << basic_str[m - 1] << " to: " << native_str[n - 1] << " at: " << m - 1 << '\n';
 #endif
-                node a{m - 1, m - 1, node_type::replace, std::string{log_str[n - 1]}};
+                node_t a{
+                    .content_ = {native_str[n - 1]},
+                    .low_ = m - 1,
+                    .high_ = m - 1,
+                    .type_ = node_type_enum::replace};
                 if (node_stack.empty())
                 {
                     node_stack.push(a);
                 }
                 else
                 {
-                    node b{node_stack.top()};
+                    node_t b{node_stack.top()};
                     if (a.type_ == b.type_ && a.low_ + 1 == b.low_)
                     {
                         a.high_ = b.high_;
@@ -118,10 +130,11 @@ namespace neu
         return node_stack;
     }
 
-    std::string merge_str_by_node_stack(std::string_view basic_str, std::stack<node> &&node_stack)
+    str_t
+    merge_str_by_node_stack(str_v_t basic_str, node_stack_t &&node_stack)
     {
-        std::string merged_str{};
-        int i{0};
+        str_t merged_str{};
+        offset_t i{0};
         while (i < basic_str.size() || !node_stack.empty())
         {
             if (node_stack.empty())
@@ -129,37 +142,38 @@ namespace neu
                 merged_str += basic_str.substr(i);
                 break;
             }
-            auto d{node_stack.top()};
+            auto node{node_stack.top()};
             node_stack.pop();
-            switch (d.type_)
+            switch (node.type_)
             {
-            case node_type::insert:
-                merged_str += basic_str.substr(i, d.low_ - i + 1);
-                merged_str += d.content_;
-                i = d.high_;
+            case node_type_enum::insert:
+                merged_str += basic_str.substr(i, node.low_ - i + 1);
+                merged_str += node.content_;
+                i = node.high_;
                 break;
-            case node_type::del:
-                merged_str += basic_str.substr(i, d.low_ - i);
-                i = d.high_ + 1;
+            case node_type_enum::deletE:
+                merged_str += basic_str.substr(i, node.low_ - i);
+                i = node.high_ + 1;
                 break;
-            case node_type::replace:
-                merged_str += basic_str.substr(i, d.low_ - i);
-                merged_str += d.content_;
-                i = d.high_ + 1;
+            case node_type_enum::replace:
+                merged_str += basic_str.substr(i, node.low_ - i);
+                merged_str += node.content_;
+                i = node.high_ + 1;
                 break;
             default:
-                assert(false);
+                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n'; 
                 break;
             }
         }
         return merged_str;
     }
 
-    std::string merge_str_by_delta(std::string_view basic_str, const delta_type &delta)
+    str_t
+    merge_str_by_delta(str_v_t basic_str, const delta_t &delta)
     {
-        std::string merged_str{};
-        int i{0};
-        int j{0};
+        str_t merged_str{};
+        offset_t i{0};
+        delta_t::size_type j{0};
         while (i < basic_str.size() || j < delta.size())
         {
             if (j == delta.size())
@@ -167,26 +181,26 @@ namespace neu
                 merged_str += basic_str.substr(i);
                 break;
             }
-            auto d{delta[j]};
+            auto node{delta[j]};
             ++j;
-            switch (d.type_)
+            switch (node.type_)
             {
-            case node_type::insert:
-                merged_str += basic_str.substr(i, d.low_ - i + 1);
-                merged_str += d.content_;
-                i = d.high_;
+            case node_type_enum::insert:
+                merged_str += basic_str.substr(i, node.low_ - i + 1);
+                merged_str += node.content_;
+                i = node.high_;
                 break;
-            case node_type::del:
-                merged_str += basic_str.substr(i, d.low_ - i);
-                i = d.high_ + 1;
+            case node_type_enum::deletE:
+                merged_str += basic_str.substr(i, node.low_ - i);
+                i = node.high_ + 1;
                 break;
-            case node_type::replace:
-                merged_str += basic_str.substr(i, d.low_ - i);
-                merged_str += d.content_;
-                i = d.high_ + 1;
+            case node_type_enum::replace:
+                merged_str += basic_str.substr(i, node.low_ - i);
+                merged_str += node.content_;
+                i = node.high_ + 1;
                 break;
             default:
-                assert(false);
+                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
                 break;
             }
         }

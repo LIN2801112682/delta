@@ -45,8 +45,8 @@ int main()
             std::cout << "log_str: " << log_str << '\n';
 #endif
 
-            auto node_stack{neu::backtracking_path(basic_str, native_str)};
-            std::vector<neu::node> delta{};
+            auto node_stack{neu::extract_node_stack(basic_str, native_str)};
+            std::vector<neu::node_t> delta{};
             while (!node_stack.empty())
             {
                 auto &n{node_stack.top()};
