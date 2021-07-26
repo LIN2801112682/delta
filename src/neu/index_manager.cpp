@@ -124,7 +124,7 @@ namespace neu
                         {
                             has_left_split = true;
                             partial_merged_str = basic_str_.substr(basic_left_right_offset - i + 1, i) + partial_merged_str;
-                            native_left_right_offset += (i - 1);
+                            native_left_right_offset -= i;
                             break;
                         }
                     }
@@ -303,8 +303,22 @@ namespace neu
                     break;
                 }
             }
-
-            std::cout << "  mid: " << mid << " partial_merged_str: " << partial_merged_str << '\n';
+#if 0
+            std::cout << "  mid: " << mid << " native_left_right_offset " << native_left_right_offset << " partial_merged_str: " << partial_merged_str << '\n';
+#endif
+            split_str_t split_str{partial_merged_str, is_separator};
+            while (split_str.has_next())
+            {
+                auto [token, offset]{split_str.get_next()};
+                offset += native_left_right_offset + 1;
+#if 0
+            std::cout << "  token: " << token << " offset: " << offset << '\n';
+#endif
+                basic_token_vec_.emplace_back(token);
+                auto &doc_id_umap{basic_inverted_index_[token]};
+                auto &offset_uset{doc_id_umap[doc_id]};
+                offset_uset.emplace(offset);
+            }
         }
     }
 
