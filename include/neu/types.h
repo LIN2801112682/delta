@@ -20,7 +20,7 @@ namespace neu
     if (offset_t == signed) offset >= 0
     if (offset_t == unsigned) offset != offset_t::max
     */
-    using offset_t = int; // 边界问题非常复杂，还是直接用 signed 比较方便。
+    using offset_t = long; // bound problem is so complex that using signed type
     /*
     using offset_t = str_t::size_type;
     static const offset_t k_offset_minus_num = (std::numeric_limits<offset_t>::max)();
@@ -44,10 +44,6 @@ namespace neu
 
     using delta_t = std::vector<node_t>;
     using node_stack_t = std::stack<node_t>;
-
-    using off_uset_t = std::unordered_set<offset_t>;
-    using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
-    using inverted_index_t = std::unordered_map<str_t, doc_id_umap_t>;
 };
 
 #endif

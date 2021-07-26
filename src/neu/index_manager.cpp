@@ -43,8 +43,9 @@ namespace neu
     }
 
     void
-    index_manager::add_delta_index(const doc_id_t doc_id, const delta_t &delta)
+    index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
+        delta_umap_.emplace(doc_id, delta);
         for (int mid{0}; mid < delta.size(); ++mid)
         {
             const auto &node{delta[mid]};
@@ -306,8 +307,7 @@ namespace neu
 #if 0
             std::cout << "  token: " << token << " offset: " << offset << '\n';
 #endif
-                basic_token_vec_.emplace_back(token);
-                auto &doc_id_umap{basic_inverted_index_[token]};
+                auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset);
             }
@@ -326,8 +326,16 @@ namespace neu
             {
                 for (const auto &[doc_id, offset_uset] : doc_id_umap)
                 {
-                    // todo
-                    result[doc_id] = offset_uset;
+                    for (const auto &offset : offset_uset)
+                    {
+                        /* todo
+                        auto real_offset{get_real_offset(doc_id, token, offset)};
+                        if (real_offset >= 0)
+                        {
+                            result[doc_id].emplace(offset);
+                        }
+                        */
+                    }
                 }
             }
         }
@@ -337,7 +345,10 @@ namespace neu
             {
                 for (const auto &[doc_id, offset_uset] : doc_id_umap)
                 {
-                    result[doc_id] = offset_uset;
+                    for (const auto &offset : offset_uset)
+                    {
+                        result[doc_id].emplace(offset);
+                    }
                 }
             }
         }

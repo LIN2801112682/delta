@@ -46,9 +46,7 @@ int main()
 #endif
 
             auto node_stack{neu::extract_node_stack(basic_str, native_str)};
-            auto delta{neu::node_stack_to_delta(std::move(node_stack))};
-            ++doc_id;
-            manager.add_delta_index(doc_id, delta);
+            manager.add_delta_index(++doc_id, neu::node_stack_to_delta(std::move(node_stack)));
         }
     }
 
@@ -73,7 +71,6 @@ int main()
 
     for (const auto &regex_str : regex_str_vec)
     {
-        std::cout << regex_str << '\n';
         {
             auto begin_time{std::chrono::high_resolution_clock::now()};
             SCOPE_GUARD
