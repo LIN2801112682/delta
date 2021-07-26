@@ -25,10 +25,12 @@ namespace neu
     index_manager::index_manager(str_v_t basic_str)
         : basic_str_{basic_str}
     {
-        split_str_t split_str{basic_str, is_separator};
+        std::cout << basic_str << '\n';
+        split_str_t split_str{basic_str_, is_separator};
         while (split_str.has_next())
         {
             auto [token, offset]{split_str.get_next()};
+            std::cout << ' ' << token << ' ' << offset << '\n';
             basic_token_vec_.emplace_back(token);
             auto &doc_id_umap{basic_inverted_index_[token]};
             auto &offset_uset{doc_id_umap[k_basic_doc_id]};

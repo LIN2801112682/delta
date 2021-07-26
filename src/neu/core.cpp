@@ -1,5 +1,4 @@
 #include "neu/core.h"
-#include <limits>
 #include <iostream>
 
 namespace neu
@@ -48,7 +47,7 @@ namespace neu
         if (offset_t == signed) offset >= 0
         if (offset_t == unsigned) offset != offset_t::max
         */
-        while (basic_str_offset != (std::numeric_limits<offset_t>::max)() && native_str_offset != (std::numeric_limits<offset_t>::max)())
+        while (basic_str_offset != k_offset_minus_num && native_str_offset != k_offset_minus_num)
         {
             if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
@@ -160,46 +159,6 @@ namespace neu
             delta.emplace_back(node);
         }
         return delta;
-    }
-
-    void cal_native_str_offset(delta_t &delta)
-    {
-        for (delta_t::size_type i{0}; i < delta.size(); ++i)
-        {
-            offset_t offset{0};
-            for (delta_t::size_type j{0}; j < i; ++j)
-            {
-                const node_t &pre_node{delta[j]};
-                switch (pre_node.type_)
-                {
-                case node_type_enum::insert:
-                    offset += pre_node.content_.size();
-                    break;
-                case node_type_enum::deletE:
-                    offset -= (pre_node.high_ - pre_node.low_ + 1);
-                    break;
-                case node_type_enum::replace:
-                    break;
-                default:
-                    std::cerr << "error node type enum: " << static_cast<int>(pre_node.type_) << '\n';
-                    break;
-                }
-            }
-            node_t &node{delta[i]};
-            switch (node.type_)
-            {
-            case node_type_enum::insert:
-                node.native_str_offset_ = offset + node.low_;
-                break;
-            case node_type_enum::deletE:
-            case node_type_enum::replace:
-                node.native_str_offset_ = offset + node.low_ - 1;
-                break;
-            default:
-                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
-                break;
-            }
-        }
     }
 
     str_t
