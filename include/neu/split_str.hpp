@@ -29,7 +29,7 @@ namespace neu
         {
             if (has_next())
             {
-                std::tuple<str_t, offset_t> result{next_, next_offset_};
+                std::tuple<str_t, offset_t> result{next_token_, next_offset_};
                 next_offset_ = k_offset_minus_num;
                 return result;
             }
@@ -60,7 +60,7 @@ namespace neu
                 if ((check_separator_func_(ch) || offset_ == str_.size() - 1) && is_find_begin)
                 {
                     is_find_begin = false;
-                    next_ = str_.substr(begin, end - begin + 1);
+                    next_token_ = str_.substr(begin, end - begin + 1);
                     next_offset_ = begin;
                     ++offset_;
                     return;
@@ -73,7 +73,7 @@ namespace neu
         const str_t str_;
         const std::function<bool(const ch_t ch)> check_separator_func_;
         offset_t offset_{0};
-        str_t next_{};
+        str_t next_token_{};
         offset_t next_offset_{k_offset_minus_num};
     };
 };

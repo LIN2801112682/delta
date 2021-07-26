@@ -48,7 +48,7 @@ int main()
             auto node_stack{neu::extract_node_stack(basic_str, native_str)};
             auto delta{neu::node_stack_to_delta(std::move(node_stack))};
             ++doc_id;
-            manager.add_index(doc_id, delta);
+            manager.add_delta_index(doc_id, delta);
         }
     }
 

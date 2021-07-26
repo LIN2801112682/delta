@@ -12,7 +12,7 @@ namespace neu
     public:
         static constexpr doc_id_t k_basic_doc_id{0};
         index_manager(str_v_t basic_str);
-        void add_index(const doc_id_t doc_id, const delta_t &delta);
+        void add_delta_index(const doc_id_t doc_id, const delta_t &delta);
         doc_id_umap_t regex_query(const str_t &regex_str);
 
     private:

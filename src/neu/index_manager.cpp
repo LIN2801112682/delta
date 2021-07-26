@@ -25,12 +25,16 @@ namespace neu
     index_manager::index_manager(str_v_t basic_str)
         : basic_str_{basic_str}
     {
-        std::cout << basic_str << '\n';
+#if 0
+        std::cout << "basic_str_: " << basic_str_ << '\n';
+#endif
         split_str_t split_str{basic_str_, is_separator};
         while (split_str.has_next())
         {
             auto [token, offset]{split_str.get_next()};
-            std::cout << ' ' << token << ' ' << offset << '\n';
+#if 0
+            std::cout << "  token: " << token << " offset: " << offset << '\n';
+#endif
             basic_token_vec_.emplace_back(token);
             auto &doc_id_umap{basic_inverted_index_[token]};
             auto &offset_uset{doc_id_umap[k_basic_doc_id]};
@@ -39,7 +43,7 @@ namespace neu
     }
 
     void
-    index_manager::add_index(const doc_id_t doc_id, const delta_t &delta)
+    index_manager::add_delta_index(const doc_id_t doc_id, const delta_t &delta)
     {
         // todo
     }

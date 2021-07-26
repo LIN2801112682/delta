@@ -35,7 +35,7 @@ namespace neu
         str_t content_;
         offset_t low_;
         offset_t high_;
-        offset_t native_str_offset_;
+        offset_t native_offset_;
         node_type_enum type_;
     };
 
