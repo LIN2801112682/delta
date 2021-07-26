@@ -37,7 +37,7 @@ int main()
         };
 
         neu::str_t native_str{};
-        neu::doc_id_t doc_id{neu::k_basic_doc_id};
+        neu::doc_id_t doc_id{neu::index_manager::k_basic_doc_id};
         while (getline(native_ifs, native_str))
         {
             std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
@@ -55,8 +55,7 @@ int main()
             }
 
             ++doc_id;
-            manager.add_delta_invert_index(doc_id, delta);
-            manager.add_native_inverted_index(doc_id, native_str);
+            manager.add_index(doc_id, delta);
         }
     }
 
@@ -92,24 +91,9 @@ int main()
                 std::cout << " time: " << program_times << " microseconds\n";
             };
 
-            auto result{manager.regex_query_delta_invert_index(regex_str)};
+            auto result{manager.regex_query(regex_str)};
             std::cout << "  delta_result_count: " << result.size();
         }
-
-        {
-            auto begin_time{std::chrono::high_resolution_clock::now()};
-            SCOPE_GUARD
-            {
-                auto end_time = std::chrono::high_resolution_clock::now();
-                auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
-                auto program_times = elapsed_time.count();
-                std::cout << " time: " << program_times << " microseconds\n";
-            };
-
-            auto result{manager.regex_query_delta_invert_index(regex_str)};
-            std::cout << "  native_result_count: " << result.size();
-        }
-        std::cout << "----\n";
     }
 
     return 0;

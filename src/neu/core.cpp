@@ -45,8 +45,8 @@ namespace neu
         auto basic_str_offset{basic_str_size};
         auto native_str_offset{native_str_size};
         /*
-        if (offset_t == signed) offset > 0
-        if (offset_t == unsigned) offset != max
+        if (offset_t == signed) offset >= 0
+        if (offset_t == unsigned) offset != offset_t::max
         */
         while (basic_str_offset != (std::numeric_limits<offset_t>::max)() && native_str_offset != (std::numeric_limits<offset_t>::max)())
         {

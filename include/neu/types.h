@@ -18,7 +18,7 @@ namespace neu
     using doc_id_t = col_t::size_type;
     using offset_t = str_t::size_type;
 
-    enum class node_type_enum : int
+    enum class node_type_enum
     {
         insert = 1,
         deletE,
@@ -35,6 +35,10 @@ namespace neu
 
     using delta_t = std::vector<node_t>;
     using node_stack_t = std::stack<node_t>;
+
+    using off_uset_t = std::unordered_set<offset_t>;
+    using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
+    using index_t = std::unordered_map<str_t, doc_id_umap_t>;
 };
 
 #endif

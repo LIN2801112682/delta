@@ -27,13 +27,11 @@ namespace neu
     }
 
     void
-    add_general_inverted_index(inverted_index_t &inverted_index, const doc_id_t doc_id, const str_t &str)
+    split_str(str_v_t str)
     {
-        /*
-        position_t position{0};
-        off_t begin, end;
+        offset_t begin{0}, end{0};
         bool is_find_begin{false};
-        for (off_t i{0}; i < str.size(); ++i)
+        for (offset_t i{0}; i < str.size(); ++i)
         {
             const ch_t &ch{str[i]};
             if (!isSeparator(ch))
@@ -62,30 +60,24 @@ namespace neu
                         }});
             }
         }
-        */
     }
 
-    index_manager::index_manager(const str_t &basic_str)
+    index_manager::index_manager(str_v_t basic_str)
         : basic_str_{basic_str}
     {
-        add_general_inverted_index(basic_inverted_index_, k_basic_doc_id, basic_str_);
+        
+        //add_general_inverted_index(basic_inverted_index_, k_basic_doc_id, basic_str_);
     }
 
     void
-    index_manager::add_delta_invert_index(const doc_id_t doc_id, const delta_t &delta)
+    index_manager::add_index(const doc_id_t doc_id, const delta_t &delta)
     {
-        auto merged_str{merge_str_by_delta(basic_str_, delta)};
-        add_general_inverted_index(delta_inverted_index_, doc_id, merged_str);
+        //auto merged_str{merge_str_by_delta(basic_str_, delta)};
+        //add_general_inverted_index(delta_inverted_index_, doc_id, merged_str);
     }
 
-    void
-    index_manager::add_native_inverted_index(const doc_id_t doc_id, const str_t &native_str)
-    {
-        add_general_inverted_index(native_inverted_index_, doc_id, native_str);
-    }
-
-    auto
-    regex_query_general_invert_index(const inverted_index_t &inverted_index, const str_t &regex_str)
+    doc_id_umap_t
+    index_manager::regex_query(str_v_t regex_str)
     {
         doc_id_umap_t result{};
         /*
@@ -103,17 +95,5 @@ namespace neu
         }
         */
         return result;
-    }
-
-    doc_id_umap_t
-    index_manager::regex_query_delta_invert_index(const str_t &regex_str)
-    {
-        return regex_query_general_invert_index(delta_inverted_index_, regex_str);
-    }
-
-    doc_id_umap_t
-    index_manager::regex_query_native_invert_index(const str_t &regex_str)
-    {
-        return regex_query_general_invert_index(native_inverted_index_, regex_str);
     }
 };
