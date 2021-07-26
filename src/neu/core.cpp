@@ -7,7 +7,8 @@ namespace neu
     extract_node_stack(str_v_t basic_str, str_v_t native_str)
     {
         node_stack_t node_stack{};
-        auto basic_str_size{basic_str.size()}, native_str_size{native_str.size()};
+        offset_t basic_str_size{static_cast<offset_t>(basic_str.size())};
+        offset_t native_str_size{static_cast<offset_t>(native_str.size())};
         std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
         for (offset_t offset{0}; offset < dp.size(); ++offset)
         {
@@ -45,7 +46,8 @@ namespace neu
         if (offset_t == signed) offset >= 0
         if (offset_t == unsigned) offset != offset_t::max
         */
-        while (basic_str_offset != k_offset_minus_num && native_str_offset != k_offset_minus_num)
+        while (basic_str_offset >= 0 && native_str_offset >= 0)
+        // while (basic_str_offset != k_offset_minus_num && native_str_offset != k_offset_minus_num)
         {
             if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {

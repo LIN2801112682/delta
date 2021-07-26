@@ -17,12 +17,12 @@ namespace neu
 
         bool has_next()
         {
-            if (next_offset_ != k_offset_minus_num)
+            if (next_offset_ >= 0)
             {
                 return true;
             }
             do_get_next();
-            return next_offset_ != k_offset_minus_num;
+            return next_offset_ >= 0;
         }
 
         std::tuple<str_t, offset_t> get_next()
@@ -30,7 +30,7 @@ namespace neu
             if (has_next())
             {
                 std::tuple<str_t, offset_t> result{next_token_, next_offset_};
-                next_offset_ = k_offset_minus_num;
+                next_offset_ = -1;
                 return result;
             }
             else
@@ -74,7 +74,7 @@ namespace neu
         const std::function<bool(const ch_t ch)> check_separator_func_;
         offset_t offset_{0};
         str_t next_token_{};
-        offset_t next_offset_{k_offset_minus_num};
+        offset_t next_offset_{-1};
     };
 };
 

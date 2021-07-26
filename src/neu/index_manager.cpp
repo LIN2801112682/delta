@@ -105,7 +105,7 @@ namespace neu
                 }
 
                 // 从左扫描没有被修改过的片段
-                for (int i{0}; basic_left_left_offset <= basic_left_right_offset - i; ++i)
+                for (offset_t i{0}; basic_left_left_offset <= basic_left_right_offset - i; ++i)
                 {
                     const ch_t &ch{basic_str_[basic_left_right_offset - i]};
                     // 截断
@@ -131,7 +131,7 @@ namespace neu
                 {
                 case node_type_enum::insert:
                     native_left_right_offset = left_node.native_left_right_offset_;
-                    for (int i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
+                    for (offset_t i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
                     {
                         const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
                         if (is_separator(ch))
@@ -150,7 +150,7 @@ namespace neu
                     break;
                 case node_type_enum::replace:
                     native_left_right_offset = left_node.native_left_right_offset_;
-                    for (int i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
+                    for (offset_t i{0}; 0 <= left_node.content_.size() - 1 - i; ++i)
                     {
                         const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
                         if (is_separator(ch))
@@ -190,7 +190,7 @@ namespace neu
                 }
 
                 // 从右扫描没有被修改过的片段
-                for (int i{0}; basic_right_left_offset + i <= basic_right_right_offset; ++i)
+                for (offset_t i{0}; basic_right_left_offset + i <= basic_right_right_offset; ++i)
                 {
                     const ch_t &ch{basic_str_[basic_right_left_offset + i]};
                     // 截断
@@ -214,7 +214,7 @@ namespace neu
                 switch (right_node.type_)
                 {
                 case node_type_enum::insert:
-                    for (int i{0}; i <= right_node.content_.size() - 1; ++i)
+                    for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                     {
                         const ch_t &ch{right_node.content_[i]};
                         if (is_separator(ch))
@@ -235,7 +235,7 @@ namespace neu
                     basic_right_left_offset = right_node.high_ + 1;
                     break;
                 case node_type_enum::replace:
-                    for (int i{0}; i <= right_node.content_.size() - 1; ++i)
+                    for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                     {
                         const ch_t &ch{right_node.content_[i]};
                         if (is_separator(ch))
@@ -257,7 +257,7 @@ namespace neu
                     break;
                 }
             }
-            std::cout << "  partial_merged_str: " << partial_merged_str << '\n'; 
+            std::cout << "  mid: " << mid << " partial_merged_str: " << partial_merged_str << '\n';
         }
     }
 

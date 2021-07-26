@@ -16,12 +16,15 @@ namespace neu
     using doc_t = std::vector<str_t>;             //doc = document
     using col_t = std::vector<doc_t>;             //col = collection
     using doc_id_t = col_t::size_type;
-    using offset_t = str_t::size_type;
     /*
     if (offset_t == signed) offset >= 0
     if (offset_t == unsigned) offset != offset_t::max
     */
+    using offset_t = int; // 边界问题非常复杂，还是直接用 signed 比较方便。
+    /*
+    using offset_t = str_t::size_type;
     static const offset_t k_offset_minus_num = (std::numeric_limits<offset_t>::max)();
+    */
 
     enum class node_type_enum
     {
