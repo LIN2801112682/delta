@@ -42,7 +42,7 @@ int main()
         {
             std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
 #if 0
-            std::cout << "log_str: " << log_str << '\n';
+            std::cout << "native_str: " << native_str << '\n';
 #endif
 
             auto node_stack{neu::extract_node_stack(basic_str, native_str)};

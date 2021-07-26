@@ -45,10 +45,6 @@ namespace neu
     void
     index_manager::add_delta_index(const doc_id_t doc_id, const delta_t &delta)
     {
-        std::cout << "basic_str: " << basic_str_ << '\n';
-        auto merged_str{neu::merge_str_by_delta(basic_str_, delta)};
-        std::cout << "merged_str: " << merged_str << '\n';
-
         for (int mid{0}; mid < delta.size(); ++mid)
         {
             const auto &node{delta[mid]};
@@ -168,10 +164,6 @@ namespace neu
                         native_left_right_offset = left_node.native_left_right_offset_;
                         for (offset_t i{0}; i <= left_node.content_.size() - 1; ++i)
                         {
-                            if (i > 50)
-                            {
-                                std::cout << "          i: " << left_node.content_.size() - 1 - i << '\n';
-                            }
                             const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
                             if (is_separator(ch))
                             {
@@ -304,7 +296,7 @@ namespace neu
                 }
             }
 #if 0
-            std::cout << "  mid: " << mid << " native_left_right_offset " << native_left_right_offset << " partial_merged_str: " << partial_merged_str << '\n';
+            std::cout << "  mid: " << mid << " native_left_right_offset: " << native_left_right_offset << " partial_merged_str: " << partial_merged_str << '\n';
 #endif
             split_str_t split_str{partial_merged_str, is_separator};
             while (split_str.has_next())
