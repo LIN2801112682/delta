@@ -35,7 +35,6 @@ namespace neu
 #if 0
             std::cout << "  token: " << token << " offset: " << offset << '\n';
 #endif
-            basic_token_vec_.emplace_back(token);
             auto &doc_id_umap{basic_inverted_index_[token]};
             auto &offset_uset{doc_id_umap[k_basic_doc_id]};
             offset_uset.emplace(offset);
@@ -67,20 +66,20 @@ namespace neu
             {
             case node_type_enum::insert:
                 partial_merged_str = node.content_;
-                native_left_right_offset = node.native_left_right_offset_;
+                native_left_right_offset = node.native_right_left_offset_;
                 basic_left_right_offset = node.low_;
                 basic_right_left_offset = node.high_;
                 has_left_split = is_separator(partial_merged_str[0]);
                 has_right_split = is_separator(partial_merged_str[partial_merged_str.size() - 1]);
                 break;
             case node_type_enum::deletE:
-                native_left_right_offset = node.native_left_right_offset_;
+                native_left_right_offset = node.native_right_left_offset_;
                 basic_left_right_offset = node.low_ - 1;
                 basic_right_left_offset = node.high_ + 1;
                 break;
             case node_type_enum::replace:
                 partial_merged_str = node.content_;
-                native_left_right_offset = node.native_left_right_offset_;
+                native_left_right_offset = node.native_right_left_offset_;
                 basic_left_right_offset = node.low_ - 1;
                 basic_right_left_offset = node.high_ + 1;
                 has_left_split = is_separator(partial_merged_str[0]);
@@ -143,7 +142,7 @@ namespace neu
                     switch (left_node.type_)
                     {
                     case node_type_enum::insert:
-                        native_left_right_offset = left_node.native_left_right_offset_;
+                        native_left_right_offset = left_node.native_right_left_offset_;
                         for (offset_t i{0}; i <= left_node.content_.size() - 1; ++i)
                         {
                             const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
@@ -163,11 +162,11 @@ namespace neu
                         basic_left_right_offset = left_node.low_;
                         break;
                     case node_type_enum::deletE:
-                        native_left_right_offset = left_node.native_left_right_offset_;
+                        native_left_right_offset = left_node.native_right_left_offset_;
                         basic_left_right_offset = left_node.low_ - 1;
                         break;
                     case node_type_enum::replace:
-                        native_left_right_offset = left_node.native_left_right_offset_;
+                        native_left_right_offset = left_node.native_right_left_offset_;
                         for (offset_t i{0}; i <= left_node.content_.size() - 1; ++i)
                         {
                             const ch_t &ch{left_node.content_[left_node.content_.size() - 1 - i]};
@@ -319,31 +318,313 @@ namespace neu
         }
     }
 
+    struct token_offset_t
+    {
+        str_t token;
+        offset_t offset;
+    };
+
     doc_id_umap_t
     index_manager::regex_query(const str_t &regex_str)
     {
         doc_id_umap_t result{};
         std::regex pattern{regex_str};
         std::smatch regex_result;
+
+        std::vector<token_offset_t> token_offset_vec{};
         for (const auto &[token, doc_id_umap] : basic_inverted_index_)
         {
             if (regex_match(token, regex_result, pattern))
             {
-                for (const auto &[doc_id, offset_uset] : doc_id_umap)
+                for (const auto &[_, offset_uset] : doc_id_umap)
                 {
                     for (const auto &offset : offset_uset)
                     {
-                        /* todo
-                        auto real_offset{get_real_offset(doc_id, token, offset)};
-                        if (real_offset >= 0)
-                        {
-                            result[doc_id].emplace(offset);
-                        }
-                        */
+                        token_offset_vec.emplace_back(
+                            token_offset_t{
+                                .token = token,
+                                .offset = offset,
+                            });
                     }
                 }
             }
         }
+        std::sort(std::begin(token_offset_vec),
+                  std::end(token_offset_vec),
+                  [](const auto &lhs, const auto &rhs)
+                  {
+                      return lhs.offset < rhs.offset;
+                  });
+        for (const auto &[doc_id, delta] : delta_umap_)
+        {
+            offset_t native_left_offset{-1};
+            offset_t basic_left_offset{0};
+            offset_t basic_right_offset{static_cast<offset_t>(basic_str_.size()) - 1};
+            int token_offset_vec_idx{0};
+            int mid{0};
+            while (mid < delta.size() && token_offset_vec_idx < token_offset_vec.size())
+            {
+                const auto &node{delta[mid]};
+                switch (node.type_)
+                {
+                case node_type_enum::insert:
+                    basic_right_offset = node.low_;
+                    break;
+                case node_type_enum::deletE:
+                    basic_right_offset = node.low_ - 1;
+                    break;
+                case node_type_enum::replace:
+                    basic_right_offset = node.low_ - 1;
+                    break;
+                default:
+                    std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
+                    break;
+                }
+
+                if (basic_left_offset <= basic_right_offset)
+                {
+                    for (; token_offset_vec_idx < token_offset_vec.size(); ++token_offset_vec_idx)
+                    {
+                        const auto &token_offset{token_offset_vec[token_offset_vec_idx]};
+                        if (basic_right_offset < token_offset.offset)
+                        {
+                            break;
+                        }
+
+                        bool has_left_split{false};
+                        if (basic_left_offset < token_offset.offset)
+                        {
+                            has_left_split = true;
+                        }
+                        else if (basic_left_offset == token_offset.offset)
+                        {
+                            auto left{mid - 1};
+                            if (left < 0)
+                            {
+                                has_left_split = true;
+                            }
+                            else
+                            {
+                                const auto &left_node{delta[left]};
+                                offset_t pre_offset{-1}; // case init
+                                switch (left_node.type_)
+                                {
+                                case node_type_enum::insert:
+                                    if (is_separator(left_node.content_[left_node.content_.size() - 1]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                case node_type_enum::deletE:
+                                    // ignore continuial detla situation, todo
+                                    pre_offset = left_node.low_ - 1;
+                                    if (0 <= pre_offset && is_separator(basic_str_[pre_offset]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                case node_type_enum::replace:
+                                    if (is_separator(left_node.content_[left_node.content_.size() - 1]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                default:
+                                    std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (has_left_split)
+                        {
+                            bool has_right_split{false};
+                            if (token_offset.offset + token_offset.token.size() < basic_right_offset)
+                            {
+                                has_right_split = true;
+                            }
+                            else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
+                            {
+                                auto right{mid - 1};
+                                if (delta.size() - 1 < right)
+                                {
+                                    has_right_split = true;
+                                }
+                                else
+                                {
+                                    const auto &right_node{delta[right]};
+                                    offset_t post_offset{static_cast<offset_t>(basic_str_.size())}; // case init
+                                    switch (right_node.type_)
+                                    {
+                                    case node_type_enum::insert:
+                                        if (is_separator(right_node.content_[0]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    case node_type_enum::deletE:
+                                        // ignore continuial detla situation, todo
+                                        post_offset = right_node.high_ + 1;
+                                        if (post_offset <= basic_str_.size() - 1 && is_separator(basic_str_[post_offset]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    case node_type_enum::replace:
+                                        if (is_separator(right_node.content_[0]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    default:
+                                        std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
+                                        break;
+                                    }
+                                }
+                            }
+                            if (has_right_split)
+                            {
+                                result[doc_id].emplace(native_left_offset + token_offset.offset - basic_left_offset + 1);
+                            }
+                        }
+                    }
+                }
+
+                switch (node.type_)
+                {
+                case node_type_enum::insert:
+                    native_left_offset = node.native_right_left_offset_ + node.content_.size();
+                    basic_left_offset = node.high_;
+                    break;
+                case node_type_enum::deletE:
+                    native_left_offset = node.native_right_left_offset_;
+                    basic_left_offset = node.high_ - 1;
+                    break;
+                case node_type_enum::replace:
+                    native_left_offset = node.native_right_left_offset_ + node.content_.size();
+                    basic_left_offset = node.high_ - 1;
+                    break;
+                default:
+                    std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
+                    break;
+                }
+                ++mid;
+            }
+
+            if (token_offset_vec_idx < token_offset_vec.size())
+            {
+                basic_right_offset = static_cast<offset_t>(basic_str_.size()) - 1;
+                if (basic_left_offset <= basic_right_offset)
+                {
+                    for (; token_offset_vec_idx < token_offset_vec.size(); ++token_offset_vec_idx)
+                    {
+                        const auto &token_offset{token_offset_vec[token_offset_vec_idx]};
+                        if (basic_right_offset < token_offset.offset)
+                        {
+                            break;
+                        }
+
+                        bool has_left_split{false};
+                        if (basic_left_offset < token_offset.offset)
+                        {
+                            has_left_split = true;
+                        }
+                        else if (basic_left_offset == token_offset.offset)
+                        {
+                            auto left{mid - 1};
+                            if (left < 0)
+                            {
+                                has_left_split = true;
+                            }
+                            else
+                            {
+                                const auto &left_node{delta[left]};
+                                offset_t pre_offset{-1}; // case init
+                                switch (left_node.type_)
+                                {
+                                case node_type_enum::insert:
+                                    if (is_separator(left_node.content_[left_node.content_.size() - 1]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                case node_type_enum::deletE:
+                                    // ignore continuial detla situation, todo
+                                    pre_offset = left_node.low_ - 1;
+                                    if (0 <= pre_offset && is_separator(basic_str_[pre_offset]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                case node_type_enum::replace:
+                                    if (is_separator(left_node.content_[left_node.content_.size() - 1]))
+                                    {
+                                        has_left_split = true;
+                                    }
+                                    break;
+                                default:
+                                    std::cerr << "error node type enum: " << static_cast<int>(left_node.type_) << '\n';
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (has_left_split)
+                        {
+                            bool has_right_split{false};
+                            if (token_offset.offset + token_offset.token.size() < basic_right_offset)
+                            {
+                                has_right_split = true;
+                            }
+                            else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
+                            {
+                                auto right{mid - 1};
+                                if (delta.size() - 1 < right)
+                                {
+                                    has_right_split = true;
+                                }
+                                else
+                                {
+                                    const auto &right_node{delta[right]};
+                                    offset_t post_offset{static_cast<offset_t>(basic_str_.size())}; // case init
+                                    switch (right_node.type_)
+                                    {
+                                    case node_type_enum::insert:
+                                        if (is_separator(right_node.content_[0]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    case node_type_enum::deletE:
+                                        // ignore continuial detla situation, todo
+                                        post_offset = right_node.high_ + 1;
+                                        if (post_offset <= basic_str_.size() - 1 && is_separator(basic_str_[post_offset]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    case node_type_enum::replace:
+                                        if (is_separator(right_node.content_[0]))
+                                        {
+                                            has_right_split = true;
+                                        }
+                                        break;
+                                    default:
+                                        std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
+                                        break;
+                                    }
+                                }
+                            }
+                            if (has_right_split)
+                            {
+                                result[doc_id].emplace(native_left_offset + token_offset.offset - basic_left_offset + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         for (const auto &[token, doc_id_umap] : delta_inverted_index_)
         {
             if (regex_match(token, regex_result, pattern))

@@ -19,7 +19,6 @@ namespace neu
 
     private:
         const str_t basic_str_;
-        std::vector<str_t> basic_token_vec_{};
         std::unordered_map<str_t, doc_id_umap_t> basic_inverted_index_{};
         std::unordered_map<str_t, doc_id_umap_t> delta_inverted_index_{};
         std::unordered_map<doc_id_t, delta_t> delta_umap_{};
