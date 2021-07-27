@@ -449,7 +449,7 @@ namespace neu
                             }
                             else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
                             {
-                                auto right{mid - 1};
+                                auto right{mid + 1};
                                 if (delta.size() - 1 < right)
                                 {
                                     has_right_split = true;
@@ -595,7 +595,7 @@ namespace neu
                             }
                             else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
                             {
-                                auto right{mid - 1};
+                                auto right{mid + 1};
                                 if (delta.size() - 1 < right)
                                 {
                                     has_right_split = true;
