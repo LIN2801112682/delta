@@ -484,7 +484,16 @@ namespace neu
                             }
                             if (has_right_split)
                             {
-                                result[doc_id].emplace(native_left_offset + token_offset.offset - basic_left_offset + 1);
+#if 1
+                                auto merged_str{merge_str_by_delta(basic_str_, delta)};
+                                auto basic_token{token_offset.token};
+                                auto delta_token{merged_str.substr(native_left_offset + 1 - basic_left_offset + token_offset.offset, token_offset.token.size())};
+                                if (basic_token != delta_token)
+                                {
+                                    std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
+                                }
+#endif
+                                result[doc_id].emplace(native_left_offset + 1 - basic_left_offset + token_offset.offset);
                             }
                         }
                     }
@@ -617,7 +626,16 @@ namespace neu
                             }
                             if (has_right_split)
                             {
-                                result[doc_id].emplace(native_left_offset + token_offset.offset - basic_left_offset + 1);
+#if 1
+                                auto merged_str{merge_str_by_delta(basic_str_, delta)};
+                                auto basic_token{token_offset.token};
+                                auto delta_token{merged_str.substr(native_left_offset + 1 - basic_left_offset + token_offset.offset, token_offset.token.size())};
+                                if (basic_token != delta_token)
+                                {
+                                    std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
+                                }
+#endif
+                                result[doc_id].emplace(native_left_offset + 1 - basic_left_offset + token_offset.offset);
                             }
                         }
                     }
