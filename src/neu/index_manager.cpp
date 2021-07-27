@@ -357,7 +357,7 @@ namespace neu
                   });
         for (const auto &[doc_id, delta] : delta_umap_)
         {
-            offset_t native_left_offset{-1};
+            offset_t native_left_offset{0};
             offset_t basic_left_offset{0};
             offset_t basic_right_offset{static_cast<offset_t>(basic_str_.size()) - 1};
             int token_offset_vec_idx{0};
@@ -418,6 +418,10 @@ namespace neu
                                 case node_type_enum::deletE:
                                     // ignore continuial detla situation, todo
                                     pre_offset = left_node.low_ - 1;
+                                    if (pre_offset < 0)
+                                    {
+                                        has_left_split = true;
+                                    }
                                     if (0 <= pre_offset && is_separator(basic_str_[pre_offset]))
                                     {
                                         has_left_split = true;
@@ -465,6 +469,10 @@ namespace neu
                                     case node_type_enum::deletE:
                                         // ignore continuial detla situation, todo
                                         post_offset = right_node.high_ + 1;
+                                        if (basic_str_.size() - 1 < post_offset)
+                                        {
+                                            has_right_split = true;
+                                        }
                                         if (post_offset <= basic_str_.size() - 1 && is_separator(basic_str_[post_offset]))
                                         {
                                             has_right_split = true;
@@ -487,13 +495,13 @@ namespace neu
 #if 1
                                 auto merged_str{merge_str_by_delta(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
-                                auto delta_token{merged_str.substr(native_left_offset + 1 - basic_left_offset + token_offset.offset, token_offset.token.size())};
+                                auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
                                 if (basic_token != delta_token)
                                 {
                                     std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
                                 }
 #endif
-                                result[doc_id].emplace(native_left_offset + 1 - basic_left_offset + token_offset.offset);
+                                result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
                             }
                         }
                     }
@@ -502,16 +510,16 @@ namespace neu
                 switch (node.type_)
                 {
                 case node_type_enum::insert:
-                    native_left_offset = node.native_right_left_offset_ + node.content_.size();
+                    native_left_offset = node.native_right_left_offset_ + node.content_.size() + 1;
                     basic_left_offset = node.high_;
                     break;
                 case node_type_enum::deletE:
-                    native_left_offset = node.native_right_left_offset_;
-                    basic_left_offset = node.high_ - 1;
+                    native_left_offset = node.native_right_left_offset_ + 1;
+                    basic_left_offset = node.high_ + 1;
                     break;
                 case node_type_enum::replace:
-                    native_left_offset = node.native_right_left_offset_ + node.content_.size();
-                    basic_left_offset = node.high_ - 1;
+                    native_left_offset = node.native_right_left_offset_ + node.content_.size() + 1;
+                    basic_left_offset = node.high_ + 1;
                     break;
                 default:
                     std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
@@ -629,13 +637,13 @@ namespace neu
 #if 1
                                 auto merged_str{merge_str_by_delta(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
-                                auto delta_token{merged_str.substr(native_left_offset + 1 - basic_left_offset + token_offset.offset, token_offset.token.size())};
+                                auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
                                 if (basic_token != delta_token)
                                 {
                                     std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
                                 }
 #endif
-                                result[doc_id].emplace(native_left_offset + 1 - basic_left_offset + token_offset.offset);
+                                result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
                             }
                         }
                     }
