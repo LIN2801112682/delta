@@ -589,49 +589,11 @@ namespace neu
                         if (has_left_split)
                         {
                             bool has_right_split{false};
-                            if (token_offset.offset + token_offset.token.size() < basic_right_offset)
+                            if (token_offset.offset + token_offset.token.size() <= basic_right_offset)
                             {
                                 has_right_split = true;
                             }
-                            else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
-                            {
-                                auto right{mid + 1};
-                                if (delta.size() - 1 < right)
-                                {
-                                    has_right_split = true;
-                                }
-                                else
-                                {
-                                    const auto &right_node{delta[right]};
-                                    offset_t post_offset{static_cast<offset_t>(basic_str_.size())}; // case init
-                                    switch (right_node.type_)
-                                    {
-                                    case node_type_enum::insert:
-                                        if (is_separator(right_node.content_[0]))
-                                        {
-                                            has_right_split = true;
-                                        }
-                                        break;
-                                    case node_type_enum::deletE:
-                                        // ignore continuial detla situation, todo
-                                        post_offset = right_node.high_ + 1;
-                                        if (post_offset <= basic_str_.size() - 1 && is_separator(basic_str_[post_offset]))
-                                        {
-                                            has_right_split = true;
-                                        }
-                                        break;
-                                    case node_type_enum::replace:
-                                        if (is_separator(right_node.content_[0]))
-                                        {
-                                            has_right_split = true;
-                                        }
-                                        break;
-                                    default:
-                                        std::cerr << "error node type enum: " << static_cast<int>(right_node.type_) << '\n';
-                                        break;
-                                    }
-                                }
-                            }
+
                             if (has_right_split)
                             {
 #if 1
