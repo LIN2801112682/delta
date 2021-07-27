@@ -45,6 +45,11 @@ namespace neu
     void
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
+#if 0
+        auto merged_str{merge_str_by_delta(basic_str_, delta)};
+        std::cout << "basic_str: " << basic_str_ << '\n';
+        std::cout << "merged_str: " << merged_str << '\n';
+#endif
         delta_umap_.emplace(doc_id, delta);
         for (int mid{0}; mid < delta.size(); ++mid)
         {
