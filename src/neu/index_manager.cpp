@@ -49,7 +49,6 @@ namespace neu
         std::cout << "basic_str: " << basic_str_ << '\n';
         std::cout << "merged_str: " << merged_str << '\n';
 #endif
-        delta_umap_.emplace(doc_id, delta);
         for (int mid{0}; mid < delta.size(); ++mid)
         {
             const auto &node{delta[mid]};
@@ -316,6 +315,7 @@ namespace neu
                 offset_uset.emplace(offset);
             }
         }
+        delta_umap_.emplace(doc_id, std::move(delta));
     }
 
     struct token_offset_t
@@ -492,7 +492,7 @@ namespace neu
                             }
                             if (has_right_split)
                             {
-#if 1
+#if 0
                                 auto merged_str{merge_str_by_delta(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
                                 auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
@@ -596,7 +596,7 @@ namespace neu
 
                             if (has_right_split)
                             {
-#if 1
+#if 0
                                 auto merged_str{merge_str_by_delta(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
                                 auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
