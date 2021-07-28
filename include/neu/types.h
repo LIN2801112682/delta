@@ -28,7 +28,7 @@ namespace neu
 
     enum class node_type_enum
     {
-        insert = 1,
+        insert = 0,
         deletE,
         replace,
     };
