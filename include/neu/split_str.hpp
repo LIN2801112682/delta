@@ -10,18 +10,18 @@ namespace neu
     class split_str_t
     {
     public:
-        split_str_t(str_v_t str, check_dlm_func_t check_separator_func)
-            : str_{str},
-              check_separator_func_{check_separator_func} {}
+        split_str_t(str_v_t str_v, check_dlm_func_t check_dlm_func)
+            : str_{str_v},
+              check_dlm_func_{check_dlm_func} {}
 
         bool has_next()
         {
-            if (next_offset_ >= 0)
+            if (0 <= next_offset_)
             {
                 return true;
             }
             do_get_next();
-            return next_offset_ >= 0;
+            return (0 <= next_offset_);
         }
 
         std::tuple<str_t, offset_t> get_next()
@@ -35,19 +35,20 @@ namespace neu
             else
             {
                 std::cerr << "please get_next() after has_next().\n";
-                return {};
+                return {{}, -1};
             }
         }
 
     private:
         void do_get_next()
         {
-            offset_t begin{0}, end{0};
+            offset_t begin{};
+            offset_t end{};
             auto is_find_begin{false};
             for (; offset_ < str_.size(); ++offset_)
             {
                 const ch_t &ch{str_[offset_]};
-                if (!check_separator_func_(ch))
+                if (!check_dlm_func_(ch))
                 {
                     if (!is_find_begin)
                     {
@@ -56,7 +57,7 @@ namespace neu
                     }
                     end = offset_;
                 }
-                if ((check_separator_func_(ch) || offset_ == str_.size() - 1) && is_find_begin)
+                if ((check_dlm_func_(ch) || offset_ == str_.size() - 1) && is_find_begin)
                 {
                     is_find_begin = false;
                     next_token_ = str_.substr(begin, end - begin + 1);
@@ -68,9 +69,8 @@ namespace neu
             return;
         }
 
-    private:
         const str_t str_;
-        const std::function<bool(const ch_t ch)> check_separator_func_;
+        const check_dlm_func_t check_dlm_func_;
         offset_t offset_{0};
         str_t next_token_{};
         offset_t next_offset_{-1};
