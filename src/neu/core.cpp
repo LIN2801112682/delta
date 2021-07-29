@@ -7,8 +7,6 @@ namespace neu
     delta_t
     extract_delta(str_v_t basic_str_v, str_v_t native_str_v)
     {
-        delta_t result{};
-
         offset_t basic_str_size{static_cast<offset_t>(basic_str_v.size())};
         offset_t native_str_size{static_cast<offset_t>(native_str_v.size())};
         std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
@@ -141,14 +139,14 @@ namespace neu
             --native_str_offset;
         }
 
+        delta_t delta{};
         while (!node_stack.empty())
         {
             auto node{node_stack.top()};
             node_stack.pop();
-            result.emplace_back(std::move(node));
+            delta.emplace_back(std::move(node));
         }
-
-        return result;
+        return delta;
     }
 
     str_t
@@ -156,7 +154,7 @@ namespace neu
     {
         str_t merged_str{};
         offset_t offset{0};
-        delta_t::size_type delta_idx{0};
+        auto delta_idx{0};
         while (offset < basic_str_v.size() || delta_idx < delta.size())
         {
             if (delta_idx == delta.size())

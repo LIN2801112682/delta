@@ -5,8 +5,8 @@
 
 namespace neu
 {
-    delta_t extract_delta(str_v_t basic_str, str_v_t native_str);
-    str_t merge_str(str_v_t basic_str, const delta_t &delta);
+    delta_t extract_delta(str_v_t basic_str_v, str_v_t native_str_v);
+    str_t merge_str(str_v_t basic_str_v, const delta_t &delta);
     bool is_es_dlm(const ch_t &ch);
 };
 
