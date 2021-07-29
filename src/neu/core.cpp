@@ -5,12 +5,12 @@
 namespace neu
 {
     delta_t
-    extract_delta(str_v_t basic_str, str_v_t native_str)
+    extract_delta(str_v_t basic_str_v, str_v_t native_str_v)
     {
-        delta_t delta{};
-        std::stack<node_t> node_stack{};
-        offset_t basic_str_size{static_cast<offset_t>(basic_str.size())};
-        offset_t native_str_size{static_cast<offset_t>(native_str.size())};
+        delta_t result{};
+
+        offset_t basic_str_size{static_cast<offset_t>(basic_str_v.size())};
+        offset_t native_str_size{static_cast<offset_t>(native_str_v.size())};
         std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
         for (offset_t offset{0}; offset < dp.size(); ++offset)
         {
@@ -24,7 +24,7 @@ namespace neu
         {
             for (offset_t native_str_offset{1}; native_str_offset < dp[0].size(); ++native_str_offset)
             {
-                if (basic_str[basic_str_offset - 1] == native_str[native_str_offset - 1])
+                if (basic_str_v[basic_str_offset - 1] == native_str_v[native_str_offset - 1])
                 {
                     dp[basic_str_offset][native_str_offset] = dp[basic_str_offset - 1][native_str_offset - 1];
                 }
@@ -43,6 +43,7 @@ namespace neu
         std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
 #endif
 
+        std::stack<node_t> node_stack{};
         auto basic_str_offset{basic_str_size};
         auto native_str_offset{native_str_size};
         while (basic_str_offset >= 0 && native_str_offset >= 0)
@@ -50,10 +51,10 @@ namespace neu
             if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "insert: " << native_str[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "insert: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
-                    .content_ = str_t{native_str[native_str_offset - 1]},
+                    .content_ = str_t{native_str_v[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset,
                     .native_right_left_offset_ = native_str_offset - 2,
@@ -79,7 +80,7 @@ namespace neu
             else if (basic_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "delete: " << basic_str[basic_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "delete: " << basic_str_v[basic_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
                     .content_ = {},
@@ -108,10 +109,10 @@ namespace neu
             else if (basic_str_offset > 0 && native_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "replace: " << basic_str[basic_str_offset - 1] << " to: " << native_str[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "replace: " << basic_str_v[basic_str_offset - 1] << " to: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
-                    .content_ = str_t{native_str[native_str_offset - 1]},
+                    .content_ = str_t{native_str_v[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
                     .high_ = basic_str_offset - 1,
                     .native_right_left_offset_ = native_str_offset - 2,
@@ -142,25 +143,25 @@ namespace neu
 
         while (!node_stack.empty())
         {
-            auto &node{node_stack.top()};
+            auto node{node_stack.top()};
             node_stack.pop();
-            delta.emplace_back(node);
+            result.emplace_back(std::move(node));
         }
 
-        return delta;
+        return result;
     }
 
     str_t
-    merge_str(str_v_t basic_str, const delta_t &delta)
+    merge_str(str_v_t basic_str_v, const delta_t &delta)
     {
         str_t merged_str{};
         offset_t offset{0};
         delta_t::size_type delta_idx{0};
-        while (offset < basic_str.size() || delta_idx < delta.size())
+        while (offset < basic_str_v.size() || delta_idx < delta.size())
         {
             if (delta_idx == delta.size())
             {
-                merged_str += basic_str.substr(offset);
+                merged_str += basic_str_v.substr(offset);
                 break;
             }
             auto node{delta[delta_idx]};
@@ -168,16 +169,16 @@ namespace neu
             switch (node.type_)
             {
             case node_type_enum::insert:
-                merged_str += basic_str.substr(offset, node.low_ - offset + 1);
+                merged_str += basic_str_v.substr(offset, node.low_ - offset + 1);
                 merged_str += node.content_;
                 offset = node.high_;
                 break;
             case node_type_enum::deletE:
-                merged_str += basic_str.substr(offset, node.low_ - offset);
+                merged_str += basic_str_v.substr(offset, node.low_ - offset);
                 offset = node.high_ + 1;
                 break;
             case node_type_enum::replace:
-                merged_str += basic_str.substr(offset, node.low_ - offset);
+                merged_str += basic_str_v.substr(offset, node.low_ - offset);
                 merged_str += node.content_;
                 offset = node.high_ + 1;
                 break;
