@@ -268,7 +268,7 @@ namespace neu
                     {
                         has_left_split = true;
                         partial_merged_str.insert(0, basic_str_v.substr(basic_left_right_offset - (i - 1), i));
-                        native_left_right_offset -= i; // todo
+                        native_left_right_offset = native_left_right_offset - i; // todo
                         break;
                     }
                 }
@@ -292,7 +292,7 @@ namespace neu
                         if (check_dlm_func(ch))
                         {
                             has_left_split = true;
-                            partial_merged_str.insert(0, left_node.content_.substr(left_node.content_.size() - i, i));
+                            partial_merged_str.insert(0, left_node.content_.substr(left_node.content_.size() - i));
                             native_left_right_offset += (left_node.content_.size() - i);
                             break;
                         }
@@ -316,7 +316,7 @@ namespace neu
                         if (check_dlm_func(ch))
                         {
                             has_left_split = true;
-                            partial_merged_str.insert(0, left_node.content_.substr(left_node.content_.size() - i, i));
+                            partial_merged_str.insert(0, left_node.content_.substr(left_node.content_.size() - i));
                             native_left_right_offset += (left_node.content_.size() - i);
                             break;
                         }
