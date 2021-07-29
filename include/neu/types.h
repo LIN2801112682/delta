@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <type_traits>
 #include <functional>
+#include <tuple>
 
 namespace neu
 {
@@ -39,7 +40,7 @@ namespace neu
 
     using delta_t = std::vector<node_t>;
 
-    using check_dlm_func_t = std::function<bool(const ch_t &ch)>; // func = function
+    using check_dlm_func_t = std::function<bool(const ch_t ch)>; // func = function
 };
 
 #endif

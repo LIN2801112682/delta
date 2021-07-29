@@ -188,7 +188,7 @@ namespace neu
         return merged_str;
     }
 
-    bool is_es_dlm(const ch_t &ch)
+    bool is_es_dlm(const ch_t ch)
     {
         switch (ch)
         {
