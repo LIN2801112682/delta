@@ -67,7 +67,7 @@ namespace neu
                     auto next_node{node_stack.top()};
                     if (node.type_ == next_node.type_ && node.low_ == next_node.low_)
                     {
-                        node.content_ += next_node.content_;
+                        node.content_.append(next_node.content_);
                         node_stack.pop();
                     }
                     node_stack.push(node);
@@ -126,7 +126,7 @@ namespace neu
                     if (node.type_ == next_node.type_ && node.low_ + 1 == next_node.low_)
                     {
                         node.high_ = next_node.high_;
-                        node.content_ += next_node.content_;
+                        node.content_.append(next_node.content_);
                         node_stack.pop();
                     }
                     node_stack.push(node);
@@ -154,12 +154,12 @@ namespace neu
     {
         str_t merged_str{};
         offset_t offset{0};
-        auto delta_idx{0};
+        size_t delta_idx{0};
         while (offset < basic_str_v.size() || delta_idx < delta.size())
         {
             if (delta_idx == delta.size())
             {
-                merged_str += basic_str_v.substr(offset);
+                merged_str.append(basic_str_v.substr(offset));
                 break;
             }
             auto node{delta[delta_idx]};
@@ -167,17 +167,17 @@ namespace neu
             switch (node.type_)
             {
             case node_type_enum::insert:
-                merged_str += basic_str_v.substr(offset, node.low_ - offset + 1);
-                merged_str += node.content_;
+                merged_str.append(basic_str_v.substr(offset, node.low_ - offset + 1));
+                merged_str.append(node.content_);
                 offset = node.high_;
                 break;
             case node_type_enum::deletE:
-                merged_str += basic_str_v.substr(offset, node.low_ - offset);
+                merged_str.append(basic_str_v.substr(offset, node.low_ - offset));
                 offset = node.high_ + 1;
                 break;
             case node_type_enum::replace:
-                merged_str += basic_str_v.substr(offset, node.low_ - offset);
-                merged_str += node.content_;
+                merged_str.append(basic_str_v.substr(offset, node.low_ - offset));
+                merged_str.append(node.content_);
                 offset = node.high_ + 1;
                 break;
             default:
@@ -316,7 +316,7 @@ namespace neu
                         if (check_dlm_func(ch))
                         {
                             has_left_split = true;
-                            partial_merged_str = left_node.content_.substr(left_node.content_.size() - i, i) + partial_merged_str;
+                            partial_merged_str.insert(0, left_node.content_.substr(left_node.content_.size() - i, i));
                             native_left_right_offset += (left_node.content_.size() - i);
                             break;
                         }
@@ -325,7 +325,7 @@ namespace neu
                     {
                         break;
                     }
-                    partial_merged_str = left_node.content_ + partial_merged_str;
+                    partial_merged_str.insert(0, left_node.content_);
                     basic_left_right_offset = left_node.low_ - 1;
                     break;
                 default:
@@ -399,7 +399,7 @@ namespace neu
                         if (check_dlm_func(ch))
                         {
                             has_right_split = true;
-                            partial_merged_str += right_node.content_.substr(0, i);
+                            partial_merged_str.append(right_node.content_.substr(0, i));
                             break;
                         }
                     }
@@ -407,7 +407,7 @@ namespace neu
                     {
                         break;
                     }
-                    partial_merged_str += right_node.content_;
+                    partial_merged_str.append(right_node.content_);
                     basic_right_left_offset = right_node.high_;
                     break;
                 case node_type_enum::deletE:
@@ -420,7 +420,7 @@ namespace neu
                         if (check_dlm_func(ch))
                         {
                             has_right_split = true;
-                            partial_merged_str += right_node.content_.substr(0, i);
+                            partial_merged_str.append(right_node.content_.substr(0, i));
                             break;
                         }
                     }
@@ -428,7 +428,7 @@ namespace neu
                     {
                         break;
                     }
-                    partial_merged_str += right_node.content_;
+                    partial_merged_str.append(right_node.content_);
                     basic_right_left_offset = right_node.high_ + 1;
                     break;
                 default:

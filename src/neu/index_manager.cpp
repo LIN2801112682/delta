@@ -27,16 +27,18 @@ namespace neu
     void
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
-#if 1
-        auto merged_str{merge_str(basic_str_, delta)};
-        std::cout << "basic_str: " << basic_str_ << '\n';
-        std::cout << "merged_str: " << merged_str << '\n';
-#endif
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
 #if 1
-            std::cout << "partial_merged_str: " << partial_merge_str << '\n';
+            auto merged_str{merge_str(basic_str_, delta)};
+            if (partial_merged_str[0] != merged_str[offset])
+            {
+                std::cout << "basic_str: " << basic_str_ << '\n';
+                std::cout << "merged_str: " << merged_str << '\n';
+                std::cout << "p: " << partial_merged_str << " offset: " << offset << '\n';
+                std::cout << "b: " << merged_str.substr(offset, partial_merged_str.size()) << '\n';
+            }
 #endif
             split_str_t split_str{partial_merged_str, is_es_dlm};
             while (split_str.has_next())
