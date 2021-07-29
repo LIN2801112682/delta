@@ -264,7 +264,7 @@ namespace neu
                 for (offset_t i{0}; basic_left_left_offset + i <= basic_left_right_offset; ++i)
                 {
                     const ch_t &ch{basic_str_v[basic_left_right_offset - i]};
-                    if (is_es_dlm(ch))
+                    if (check_dlm_func(ch))
                     {
                         has_left_split = true;
                         partial_merged_str.insert(0, basic_str_v.substr(basic_left_right_offset - (i - 1), i));
@@ -373,7 +373,7 @@ namespace neu
                 for (offset_t i{0}; basic_right_left_offset + i <= basic_right_right_offset; ++i)
                 {
                     const ch_t &ch{basic_str_v[basic_right_left_offset + i]};
-                    if (is_es_dlm(ch))
+                    if (check_dlm_func(ch))
                     {
                         has_right_split = true;
                         partial_merged_str.append(basic_str_v.substr(basic_right_left_offset + i - 1, i));
@@ -396,7 +396,7 @@ namespace neu
                     for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                     {
                         const ch_t &ch{right_node.content_[i]};
-                        if (is_es_dlm(ch))
+                        if (check_dlm_func(ch))
                         {
                             has_right_split = true;
                             partial_merged_str += right_node.content_.substr(0, i);
@@ -417,7 +417,7 @@ namespace neu
                     for (offset_t i{0}; i <= right_node.content_.size() - 1; ++i)
                     {
                         const ch_t &ch{right_node.content_[i]};
-                        if (is_es_dlm(ch))
+                        if (check_dlm_func(ch))
                         {
                             has_right_split = true;
                             partial_merged_str += right_node.content_.substr(0, i);

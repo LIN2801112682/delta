@@ -27,7 +27,7 @@ namespace neu
     void
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
-#if 0
+#if 1
         auto merged_str{merge_str(basic_str_, delta)};
         std::cout << "basic_str: " << basic_str_ << '\n';
         std::cout << "merged_str: " << merged_str << '\n';
@@ -35,13 +35,13 @@ namespace neu
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
+#if 1
+            std::cout << "partial_merged_str: " << partial_merge_str << '\n';
+#endif
             split_str_t split_str{partial_merged_str, is_es_dlm};
             while (split_str.has_next())
             {
                 auto [token, relative_offset]{split_str.get_next()};
-#if 0
-            std::cout << "  token: " << token << " offset: " << offset + relative_offset << '\n';
-#endif
                 auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset + relative_offset);
