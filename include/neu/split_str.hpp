@@ -2,16 +2,15 @@
 #define _SPLIT_STR_HPP_
 
 #include "neu/types.h"
-#include <functional>
-#include <tuple>
 #include <iostream>
+#include <tuple>
 
 namespace neu
 {
     class split_str_t
     {
     public:
-        split_str_t(str_v_t str, std::function<bool(const ch_t ch)> check_separator_func)
+        split_str_t(str_v_t str, check_dlm_func_t check_separator_func)
             : str_{str},
               check_separator_func_{check_separator_func} {}
 
