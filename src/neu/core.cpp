@@ -32,30 +32,25 @@ namespace neu
                 {
                     dp[basic_str_offset][native_str_offset] =
                         std::min(
+                            dp[basic_str_offset - 1][native_str_offset - 1] + 1,
                             std::min(
                                 dp[basic_str_offset - 1][native_str_offset] + 1,
-                                dp[basic_str_offset][native_str_offset - 1] + 1),
-                            dp[basic_str_offset - 1][native_str_offset - 1] + 1);
+                                dp[basic_str_offset][native_str_offset - 1] + 1));
                 }
             }
         }
-
 #if 0
         std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
 #endif
-        auto basic_str_offset{basic_str_size}, native_str_offset{native_str_size};
-        /*
-        if (offset_t == signed) offset >= 0
-        if (offset_t == unsigned) offset != offset_t::max
-        */
+
+        auto basic_str_offset{basic_str_size};
+        auto native_str_offset{native_str_size};
         while (basic_str_offset >= 0 && native_str_offset >= 0)
-        // while (basic_str_offset != k_offset_minus_num && native_str_offset != k_offset_minus_num)
         {
             if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "insert: " << native_str[native_str_offset - 1]
-                    << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "insert: " << native_str[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
                     .content_ = str_t{native_str[native_str_offset - 1]},
@@ -84,8 +79,7 @@ namespace neu
             else if (basic_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "delete: " << basic_str[basic_str_offset - 1]
-                    << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "delete: " << basic_str[basic_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
                     .content_ = {},
@@ -114,9 +108,7 @@ namespace neu
             else if (basic_str_offset > 0 && native_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
 #if 0
-                std::cout << "replace: " << basic_str[basic_str_offset - 1]
-                    << " to: " << native_str[native_str_offset - 1]
-                    << " at: " << basic_str_offset - 1 << '\n';
+                std::cout << "replace: " << basic_str[basic_str_offset - 1] << " to: " << native_str[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
 #endif
                 node_t node{
                     .content_ = str_t{native_str[native_str_offset - 1]},
