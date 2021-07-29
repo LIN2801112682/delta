@@ -45,7 +45,7 @@ namespace neu
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
 #if 0
-        auto merged_str{merge_str_by_delta(basic_str_, delta)};
+        auto merged_str{merge_str(basic_str_, delta)};
         std::cout << "basic_str: " << basic_str_ << '\n';
         std::cout << "merged_str: " << merged_str << '\n';
 #endif
@@ -493,7 +493,7 @@ namespace neu
                             if (has_right_split)
                             {
 #if 0
-                                auto merged_str{merge_str_by_delta(basic_str_, delta)};
+                                auto merged_str{merge_str(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
                                 auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
                                 if (basic_token != delta_token)
@@ -597,7 +597,7 @@ namespace neu
                             if (has_right_split)
                             {
 #if 0
-                                auto merged_str{merge_str_by_delta(basic_str_, delta)};
+                                auto merged_str{merge_str(basic_str_, delta)};
                                 auto basic_token{token_offset.token};
                                 auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
                                 if (basic_token != delta_token)

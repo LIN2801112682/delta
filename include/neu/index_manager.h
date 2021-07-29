@@ -6,9 +6,6 @@
 
 namespace neu
 {
-    using off_uset_t = std::unordered_set<offset_t>;
-    using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
-
     class index_manager
     {
     public:
@@ -19,9 +16,9 @@ namespace neu
 
     private:
         const str_t basic_str_;
+        std::unordered_map<doc_id_t, delta_t> delta_umap_{};
         std::unordered_map<str_t, doc_id_umap_t> basic_inverted_index_{};
         std::unordered_map<str_t, doc_id_umap_t> delta_inverted_index_{};
-        std::unordered_map<doc_id_t, delta_t> delta_umap_{};
     };
 };
 

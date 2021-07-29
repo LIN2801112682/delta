@@ -37,8 +37,8 @@ int main()
             std::cout << "native_str: " << native_str << '\n';
 #endif
 
-            auto node_stack{neu::extract_node_stack(basic_str, native_str)};
-            auto merged_str{neu::merge_str_by_node_stack(basic_str, std::move(node_stack))};
+            auto delta{neu::extract_delta(basic_str, native_str)};
+            auto merged_str{neu::merge_str(basic_str, delta)};
 #if 0
             std::cout << "merged_str: " << merged_str << '\n';
 #endif

@@ -3,10 +3,9 @@
 
 #include <string>
 #include <vector>
-#include <limits>
 #include <unordered_map>
 #include <unordered_set>
-#include <stack>
+#include <type_traits>
 
 namespace neu
 {
@@ -16,15 +15,11 @@ namespace neu
     using doc_t = std::vector<str_t>;             //doc = document
     using col_t = std::vector<doc_t>;             //col = collection
     using doc_id_t = col_t::size_type;
-    /*
-    if (offset_t == signed) offset >= 0
-    if (offset_t == unsigned) offset != offset_t::max
-    */
-    using offset_t = long; // bound problem is so complex that using signed type
-    /*
-    using offset_t = str_t::size_type;
-    static const offset_t k_offset_minus_num = (std::numeric_limits<offset_t>::max)();
-    */
+    // bound problem is so complex that using signed type
+    // using offset_t = str_t::size_type;
+    using offset_t = std::make_signed_t<str_t::size_type>;
+    using off_uset_t = std::unordered_set<offset_t>;
+    using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
 
     enum class node_type_enum
     {
@@ -43,7 +38,6 @@ namespace neu
     };
 
     using delta_t = std::vector<node_t>;
-    using node_stack_t = std::stack<node_t>;
 };
 
 #endif

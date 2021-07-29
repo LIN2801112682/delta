@@ -45,8 +45,8 @@ int main()
             std::cout << "native_str: " << native_str << '\n';
 #endif
 
-            auto node_stack{neu::extract_node_stack(basic_str, native_str)};
-            manager.add_delta_index(++doc_id, neu::node_stack_to_delta(std::move(node_stack)));
+            auto delta{neu::extract_delta(basic_str, native_str)};
+            manager.add_delta_index(++doc_id, std::move(delta));
         }
     }
 

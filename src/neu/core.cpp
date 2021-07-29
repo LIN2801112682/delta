@@ -1,12 +1,14 @@
 #include "neu/core.h"
 #include <iostream>
+#include <stack>
 
 namespace neu
 {
-    node_stack_t
-    extract_node_stack(str_v_t basic_str, str_v_t native_str)
+    delta_t
+    extract_delta(str_v_t basic_str, str_v_t native_str)
     {
-        node_stack_t node_stack{};
+        delta_t delta{};
+        std::stack<node_t> node_stack{};
         offset_t basic_str_size{static_cast<offset_t>(basic_str.size())};
         offset_t native_str_size{static_cast<offset_t>(native_str.size())};
         std::vector<std::vector<offset_t>> dp(basic_str_size + 1, std::vector<offset_t>(native_str_size + 1, 0));
@@ -145,62 +147,19 @@ namespace neu
             --basic_str_offset;
             --native_str_offset;
         }
-        return node_stack;
-    }
 
-    delta_t
-    node_stack_to_delta(node_stack_t &&node_stack)
-    {
-        delta_t delta{};
         while (!node_stack.empty())
         {
             auto &node{node_stack.top()};
             node_stack.pop();
             delta.emplace_back(node);
         }
+
         return delta;
     }
 
     str_t
-    merge_str_by_node_stack(str_v_t basic_str, node_stack_t &&node_stack)
-    {
-        str_t merged_str{};
-        offset_t offset{0};
-        while (offset < basic_str.size() || !node_stack.empty())
-        {
-            if (node_stack.empty())
-            {
-                merged_str += basic_str.substr(offset);
-                break;
-            }
-            auto node{node_stack.top()};
-            node_stack.pop();
-            switch (node.type_)
-            {
-            case node_type_enum::insert:
-                merged_str += basic_str.substr(offset, node.low_ - offset + 1);
-                merged_str += node.content_;
-                offset = node.high_;
-                break;
-            case node_type_enum::deletE:
-                merged_str += basic_str.substr(offset, node.low_ - offset);
-                offset = node.high_ + 1;
-                break;
-            case node_type_enum::replace:
-                merged_str += basic_str.substr(offset, node.low_ - offset);
-                merged_str += node.content_;
-                offset = node.high_ + 1;
-                break;
-            default:
-                std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
-                break;
-            }
-        }
-        return merged_str;
-    }
-
-    str_t
-    merge_str_by_delta(str_v_t basic_str, const delta_t &delta)
+    merge_str(str_v_t basic_str, const delta_t &delta)
     {
         str_t merged_str{};
         offset_t offset{0};
