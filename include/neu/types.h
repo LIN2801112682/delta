@@ -10,15 +10,14 @@
 
 namespace neu
 {
-    using ch_t = char;                            //ch = character
-    using str_t = std::basic_string<ch_t>;        //str = string
-    using str_v_t = std::basic_string_view<ch_t>; //v = view
-    using doc_t = std::vector<str_t>;             //doc = document
-    using col_t = std::vector<doc_t>;             //col = collection
+    // _t = _type
+    using ch_t = char;                            // ch = character
+    using str_t = std::basic_string<ch_t>;        // str = string
+    using str_v_t = std::basic_string_view<ch_t>; // v = view
+    using doc_t = std::vector<str_t>;             // doc = document
+    using col_t = std::vector<doc_t>;             // col = collection
     using doc_id_t = col_t::size_type;
-    // bound problem is so complex that using signed type
-    // using offset_t = str_t::size_type;
-    using offset_t = std::make_signed_t<str_t::size_type>;
+    using offset_t = std::make_signed_t<str_t::size_type>; // Bound problem is so complex that we use the signed type.
     using off_uset_t = std::unordered_set<offset_t>;
     using doc_id_umap_t = std::unordered_map<doc_id_t, off_uset_t>;
 
@@ -32,16 +31,15 @@ namespace neu
     struct node_t
     {
         str_t content_;
-        offset_t low_;
-        offset_t high_;
+        offset_t low_;  //basic_str offset
+        offset_t high_; //basic_str offset
         offset_t native_right_left_offset_;
         node_type_enum type_;
     };
 
     using delta_t = std::vector<node_t>;
 
-    using check_dlm_func_t = std::function<bool(const ch_t &ch)>;
+    using check_dlm_func_t = std::function<bool(const ch_t &ch)>; // func = function
 };
-
 
 #endif
