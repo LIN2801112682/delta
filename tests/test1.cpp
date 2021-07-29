@@ -4,8 +4,8 @@
 #include <iostream>
 #include <fstream>
 
-static const std::string basic_file_path{"../resources/chr0716.txt"};
-static const std::string native_file_path{"../resources/query.txt"};
+static const std::string basic_file_path{"../resources/chr3.txt"};
+static const std::string native_file_path{"../resources/query2.txt"};
 
 int main()
 {

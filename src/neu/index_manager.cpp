@@ -31,21 +31,25 @@ namespace neu
         {
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
 #if 1
-            std::cout << "basic_str: " << basic_str_ << '\n';
             auto merged_str{merge_str(basic_str_, delta)};
-            std::cout << "merged_str: " << merged_str << '\n';
-            std::cout << "delta:\n";
-            const auto &node{delta[delta_idx]};
-            std::cout << "  node:\n";
-            std::cout << "      content: " << node.content_ << '\n';
-            std::cout << "      low: " << node.low_ << '\n';
-            std::cout << "      high: " << node.low_ << '\n';
-            std::cout << "      native_left_right_offset: " << node.native_right_left_offset_ << '\n';
-            std::cout << "      type: " << static_cast<int>(node.type_) << '\n';
-            std::cout << "  partial_merged_str: " << partial_merged_str << '\n';
-            std::cout << "  aaa: " << basic_str_.substr(delta[delta_idx].low_) << '\n';
-            std::cout << "  bbb: " << merged_str.substr(delta[delta_idx].native_right_left_offset_ + 1) << '\n';
-            std::cout << "  ccc: " << merged_str.substr(offset) << '\n';
+            if (partial_merged_str[0] != merged_str[offset])
+            {
+                const auto &node{delta[delta_idx]};
+                std::cout << "delta_idx: " << delta_idx << '\n';
+                std::cout << "basic_str: " << basic_str_ << '\n';
+                std::cout << "merged_str: " << merged_str << '\n';
+                std::cout << "delta:\n";
+                std::cout << "  node:\n";
+                std::cout << "      content: " << node.content_ << '\n';
+                std::cout << "      low: " << node.low_ << '\n';
+                std::cout << "      high: " << node.low_ << '\n';
+                std::cout << "      native_left_right_offset: " << node.native_right_left_offset_ << '\n';
+                std::cout << "      type: " << static_cast<int>(node.type_) << '\n';
+                std::cout << "  partial_merged_str: " << partial_merged_str << '\n';
+                std::cout << "  aaa: " << basic_str_.substr(delta[delta_idx].low_) << '\n';
+                std::cout << "  bbb: " << merged_str.substr(delta[delta_idx].native_right_left_offset_ + 1) << '\n';
+                std::cout << "  ccc: " << merged_str.substr(offset) << '\n';
+            }
 #endif
             split_str_t split_str{partial_merged_str, is_es_dlm};
             while (split_str.has_next())
