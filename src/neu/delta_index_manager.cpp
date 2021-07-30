@@ -69,7 +69,7 @@ namespace neu
                     std::cout << "  delta_idx: " << delta_idx << '\n';
                     std::cout << "  delta:\n";
                     std::cout << "      node:\n";
-                    std::cout << "          content: " << node.content_ << '\n';
+                    std::cout << "          content: " << node.content_ << "|\n";
                     std::cout << "          low: " << node.low_ << '\n';
                     std::cout << "          high: " << node.low_ << '\n';
                     std::cout << "          native_left_right_offset: " << node.native_right_left_offset_ << '\n';
@@ -93,20 +93,48 @@ namespace neu
                     std::cout << "merged_str: " << merged_str << '\n';
                     std::cout << "miss token: " << token << '\n';
                     std::cout << "miss doc_id: " << doc_id << '\n';
-                    std::cout << "miss offset: " << offset << '\n'
-                              << '\n';
+                    std::cout << "miss offset: " << offset << '\n';
+                    offset_t native_left_right_offset{-1};
                 }
                 else
                 {
                     if (delta_inverted_index_[token].count(doc_id) != 1)
                     {
-                        std::cout << "2\n";
-                        std::cout << "basic_str: " << basic_str_ << '\n';
-                        std::cout << "merged_str: " << merged_str << '\n';
-                        std::cout << "miss token: " << token << '\n';
-                        std::cout << "miss doc_id: " << doc_id << '\n';
-                        std::cout << "miss offset: " << offset << '\n'
-                                  << '\n';
+                        offset_t native_left_right_offset{-1};
+                        for (auto i{0}; i < delta.size(); ++i)
+                        {
+                            if (native_left_right_offset + 1 <= offset && offset <= delta[i].native_right_left_offset_ + 1)
+                            {
+                                std::cout << "2\n";
+                                std::cout << "doc_id: " << doc_id << '\n';
+                                std::cout << "basic_str: " << basic_str_ << '\n';
+                                std::cout << "merged_str: " << merged_str << '\n';
+
+                                auto node{delta[i - 1]};
+                                std::cout << "  delta_idx: " << i - 1 << '\n';
+                                std::cout << "  delta:\n";
+                                std::cout << "      node:\n";
+                                std::cout << "          content: " << node.content_ << "|\n";
+                                std::cout << "          low: " << basic_str_.substr(node.low_) << '\n';
+                                std::cout << "          high: " << basic_str_.substr(node.high_) << '\n';
+                                std::cout << "          native_left_right_offset: " << merged_str.substr(node.native_right_left_offset_) << '\n';
+                                std::cout << "          type: " << static_cast<int>(node.type_) << '\n';
+                                std::cout << "      token: " << token << '\n';
+
+                                node = delta[i];
+                                std::cout << "  delta_idx: " << i << '\n';
+                                std::cout << "  delta:\n";
+                                std::cout << "      node:\n";
+                                std::cout << "          content: " << node.content_ << "|\n";
+                                std::cout << "          low: " << basic_str_.substr(node.low_) << '\n';
+                                std::cout << "          high: " << basic_str_.substr(node.high_) << '\n';
+                                std::cout << "          native_left_right_offset: " << merged_str.substr(node.native_right_left_offset_) << '\n';
+                                std::cout << "          type: " << static_cast<int>(node.type_) << '\n';
+                                std::cout << "      token: " << token << '\n';
+                                break;
+                            }
+                            native_left_right_offset = delta[i].native_right_left_offset_;
+                        }
                     }
                     else
                     {
@@ -117,8 +145,8 @@ namespace neu
                             std::cout << "merged_str: " << merged_str << '\n';
                             std::cout << "miss token: " << token << '\n';
                             std::cout << "miss doc_id: " << doc_id << '\n';
-                            std::cout << "miss offset: " << offset << '\n'
-                                      << '\n';
+                            std::cout << "miss offset: " << offset << '\n';
+                            offset_t native_left_right_offset{-1};
                         }
                     }
                 }

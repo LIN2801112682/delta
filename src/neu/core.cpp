@@ -207,8 +207,12 @@ namespace neu
             native_left_right_offset = node.native_right_left_offset_;
             basic_left_right_offset = node.low_;
             basic_right_left_offset = node.high_;
-            has_left_split = check_dlm_func(partial_merged_str[0]);
-            has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
+            /*
+            can't judge in here. eg:
+            [_ab_]cde[_fg_], [_]abc[_def], [abc_]def[_hij]...
+            */
+            // has_left_split = check_dlm_func(partial_merged_str[0]); 
+            // has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
             break;
         case node_type_enum::deletE:
             native_left_right_offset = node.native_right_left_offset_;
@@ -220,8 +224,8 @@ namespace neu
             native_left_right_offset = node.native_right_left_offset_;
             basic_left_right_offset = node.low_ - 1;
             basic_right_left_offset = node.high_ + 1;
-            has_left_split = check_dlm_func(partial_merged_str[0]);
-            has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
+            // has_left_split = check_dlm_func(partial_merged_str[0]);
+            // has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
             break;
         default:
             std::cerr << "error node type enum: " << static_cast<int>(node.type_) << '\n';
