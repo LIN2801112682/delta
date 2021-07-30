@@ -5,6 +5,8 @@
 #include <functional>
 #include <iostream>
 
+#define DEBUG_ADD_DELTA_INDEX 1
+
 namespace neu
 {
     delta_index_manager_t::delta_index_manager_t(str_v_t basic_str_v, const check_dlm_func_t &check_dlm_func)
@@ -28,9 +30,9 @@ namespace neu
     void
     delta_index_manager_t::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
-#if 0
+#if DEBUG_ADD_DELTA_INDEX
         auto merged_str{merge_str(basic_str_, delta)};
-        std::unordered_map<offset_t, str_t> umap{};
+        std::unordered_map<offset_t, str_t> offset_umap{};
         split_str_t split_str_m{merged_str, check_dlm_func_};
         while (true)
         {
@@ -39,7 +41,7 @@ namespace neu
             {
                 break;
             }
-            umap[offset] = token;
+            offset_umap[offset] = token;
         }
 #endif
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
@@ -56,8 +58,8 @@ namespace neu
                 auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset + relative_offset);
-#if 0
-                const auto &true_value{umap[offset + relative_offset]};
+#if DEBUG_ADD_DELTA_INDEX
+                const auto &true_value{offset_umap[offset + relative_offset]};
                 if (token != true_value)
                 {
                     const auto &node{delta[delta_idx]};
@@ -79,6 +81,38 @@ namespace neu
 #endif
             }
         }
+#if DEBUG_ADD_DELTA_INDEX
+        for (auto &[offset, token] : offset_umap)
+        {
+            if (basic_inverted_index_.count(token) != 1)
+            {
+                if (delta_inverted_index_.count(token) != 1)
+                {
+                    std::cout << "miss token: " << token << '\n';
+                    std::cout << "miss doc_id: " << doc_id << '\n';
+                    std::cout << "miss offset: " << offset << '\n';
+                }
+                else
+                {
+                    if (delta_inverted_index_[token].count(doc_id) != 1)
+                    {
+                        std::cout << "miss token: " << token << '\n';
+                        std::cout << "miss doc_id: " << doc_id << '\n';
+                        std::cout << "miss offset: " << offset << '\n';
+                    }
+                    else
+                    {
+                        if (delta_inverted_index_[token][doc_id].count(offset) != 1)
+                        {
+                            std::cout << "miss token: " << token << '\n';
+                            std::cout << "miss doc_id: " << doc_id << '\n';
+                            std::cout << "miss offset: " << offset << '\n';
+                        }
+                    }
+                }
+            }
+        }
+#endif
         delta_umap_.emplace(doc_id, std::move(delta));
     }
 
