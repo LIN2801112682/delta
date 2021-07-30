@@ -476,7 +476,7 @@ namespace neu
             {
                 for (; token_offset_vec_idx < token_offset_vec.size(); ++token_offset_vec_idx)
                 {
-                    const auto &token_offset{token_offset_vec[token_offset_vec_idx]};
+                    auto &token_offset{token_offset_vec[token_offset_vec_idx]};
                     if (basic_right_offset < token_offset.offset)
                     {
                         break;
@@ -583,8 +583,16 @@ namespace neu
                         }
                         if (has_right_split)
                         {
-                            result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
+                            token_offset.offset += (native_left_offset - basic_left_offset);
                         }
+                        else
+                        {
+                            token_offset.offset = -1;
+                        }
+                    }
+                    else
+                    {
+                        token_offset.offset = -1;
                     }
                 }
             }
@@ -617,7 +625,7 @@ namespace neu
             {
                 for (; token_offset_vec_idx < token_offset_vec.size(); ++token_offset_vec_idx)
                 {
-                    const auto &token_offset{token_offset_vec[token_offset_vec_idx]};
+                    auto &token_offset{token_offset_vec[token_offset_vec_idx]};
                     if (basic_right_offset < token_offset.offset)
                     {
                         break;
@@ -678,8 +686,16 @@ namespace neu
 
                         if (has_right_split)
                         {
-                            result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
+                            token_offset.offset += (native_left_offset - basic_left_offset);
                         }
+                        else
+                        {
+                            token_offset.offset = -1;
+                        }
+                    }
+                    else
+                    {
+                        token_offset.offset = -1;
                     }
                 }
             }
