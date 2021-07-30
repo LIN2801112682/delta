@@ -5,8 +5,6 @@
 #include <functional>
 #include <iostream>
 
-#define DEBUG_ADD_DELTA_INDEX 1
-
 namespace neu
 {
     delta_index_manager_t::delta_index_manager_t(str_v_t basic_str_v, const check_dlm_func_t &check_dlm_func)
@@ -26,6 +24,8 @@ namespace neu
             offset_uset.emplace(offset);
         }
     }
+
+#define DEBUG_ADD_DELTA_INDEX 1
 
     void
     delta_index_manager_t::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
@@ -323,15 +323,6 @@ namespace neu
                             }
                             if (has_right_split)
                             {
-#if 0
-                                auto merged_str{merge_str(basic_str_, delta)};
-                                auto basic_token{token_offset.token};
-                                auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
-                                if (basic_token != delta_token)
-                                {
-                                    std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
-                                }
-#endif
                                 result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
                             }
                         }
@@ -427,15 +418,6 @@ namespace neu
 
                             if (has_right_split)
                             {
-#if 0
-                                auto merged_str{merge_str(basic_str_, delta)};
-                                auto basic_token{token_offset.token};
-                                auto delta_token{merged_str.substr(token_offset.offset + native_left_offset - basic_left_offset, token_offset.token.size())};
-                                if (basic_token != delta_token)
-                                {
-                                    std::cout << "basic_token: " << basic_token << " delta_token: " << delta_token << '\n';
-                                }
-#endif
                                 result[doc_id].emplace(token_offset.offset + native_left_offset - basic_left_offset);
                             }
                         }

@@ -68,17 +68,9 @@ int main()
         };
 #endif
         auto delta_result{delta_index_manager.regex_query(regex_str)};
-#if 0
-        std::cout << "delta_result_count: " << delta_result.size() << '\n';
-#endif
-#if 1
         auto native_result{native_index_manager.regex_query(regex_str)};
-        if (delta_result != native_result)
-        {
-            std::cerr << "delta_result_count: " << delta_result.size() << '\n';
-            std::cerr << "native_result_count: " << native_result.size() << '\n';
-        }
-#endif
+        std::cerr << "delta_result_count: " << delta_result.size() << '\n';
+        std::cerr << "native_result_count: " << native_result.size() << '\n';
     }
 
     std::cout << "index correct.\n";
