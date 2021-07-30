@@ -1,5 +1,7 @@
 #include "neu/core.h"
 #include "neu/delta_index_manager.h"
+#include "neu/native_index_manager.h"
+#include "utils/file_handler.hpp"
 #include "utils/scope_exit.hpp"
 #include <string>
 #include <iostream>
@@ -13,22 +15,24 @@ static const std::string regex_file_path{"../resources/regex-query"};
 
 int main()
 {
-    neu::str_t basic_str{};
-    {
-        std::ifstream basic_ifs{basic_file_path, std::ios::in};
-        SCOPE_GUARD
-        {
-            basic_ifs.close();
-        };
+    auto basic_str{load_first_line(basic_file_path)};
+    std::transform(std::begin(basic_str), std::end(basic_str), std::begin(basic_str), tolower);
+#if 1
+    std::cout << "basic_str: " << basic_str << '\n';
+#endif
 
-        getline(basic_ifs, basic_str);
-        std::transform(std::begin(basic_str), std::end(basic_str), std::begin(basic_str), tolower);
-#if 0
-        std::cout << "basic_str: " << basic_str << '\n';
+    auto native_str_vec{load_all_line(native_file_path)};
+    for (auto &native_str : native_str_vec)
+    {
+        std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
+#if 1
+        std::cout << "native_str: " << native_str << '\n';
 #endif
     }
 
     neu::delta_index_manager manager{basic_str};
+
+
     {
         std::ifstream native_ifs{native_file_path, std::ios::in};
         SCOPE_GUARD
