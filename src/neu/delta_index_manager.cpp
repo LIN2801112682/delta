@@ -7,8 +7,8 @@
 
 namespace neu
 {
-    delta_index_manager_t::delta_index_manager_t(str_v_t basic_str, const check_dlm_func_t &check_dlm_func)
-        : basic_str_{basic_str},
+    delta_index_manager_t::delta_index_manager_t(str_v_t basic_str_v, const check_dlm_func_t &check_dlm_func)
+        : basic_str_{basic_str_v},
         check_dlm_func_{check_dlm_func}
     {
         split_str_t split_str{basic_str_, check_dlm_func_};
