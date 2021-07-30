@@ -11,20 +11,17 @@ int main()
 
     auto native_str_vec{load_all_line(native_file_path)};
 
-    std::for_each(
-        std::cbegin(native_str_vec),
-        std::cend(native_str_vec),
-        [&basic_str](const auto &native_str)
+    for (const auto &native_str : native_str_vec)
+    {
+        auto delta{neu::extract_delta(basic_str, native_str)};
+        auto merged_str{neu::merge_str(basic_str, delta)};
+        if (native_str != merged_str)
         {
-            auto delta{neu::extract_delta(basic_str, native_str)};
-            auto merged_str{neu::merge_str(basic_str, delta)};
-            if (native_str != merged_str)
-            {
-                std::cerr << "basic_str: " << basic_str << '\n'
-                          << "native_str: " << native_str << '\n'
-                          << "merged_str: " << merged_str << '\n';
-            }
-        });
+            std::cerr << "basic_str: " << basic_str << '\n'
+                      << "native_str: " << native_str << '\n'
+                      << "merged_str: " << merged_str << '\n';
+        }
+    }
 
     std::cout << "merge correct.\n";
     return 0;
