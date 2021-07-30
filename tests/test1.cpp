@@ -1,57 +1,34 @@
 #include "neu/core.h"
-#include "utils/scope_exit.hpp"
-#include <string>
+#include "utils/file_handler.hpp"
 #include <iostream>
-#include <fstream>
+#include <string>
 
 static const std::string basic_file_path{"../resources/chr3.txt"};
 static const std::string native_file_path{"../resources/query2.txt"};
 
 int main()
 {
-    neu::str_t basic_str{};
+    auto basic_str{load_first_line(basic_file_path)};
+#if 1
+    std::cout << "basic_str: " << basic_str << '\n';
+#endif
+
+    auto native_str_vec{load_all_line(native_file_path)};
+    for (const auto &native_str : native_str_vec)
     {
-        std::ifstream basic_ifs{basic_file_path, std::ios::in};
-        SCOPE_GUARD
-        {
-            basic_ifs.close();
-        };
-
-        getline(basic_ifs, basic_str);
-#if 0
-        std::cout << "basic_str: " << basic_str << '\n';
+#if 1
+        std::cout << "native_str: " << native_str << '\n';
 #endif
-    }
-
-    {
-        std::ifstream native_ifs{native_file_path, std::ios::in};
-        SCOPE_GUARD
-        {
-            native_ifs.close();
-        };
-
-        neu::str_t native_str{};
-        while (getline(native_ifs, native_str))
-        {
-#if 0
-            std::cout << "native_str: " << native_str << '\n';
+        auto delta{neu::extract_delta(basic_str, native_str)};
+        auto merged_str{neu::merge_str(basic_str, delta)};
+#if 1
+        std::cout << "merged_str: " << merged_str << '\n';
 #endif
-
-            auto delta{neu::extract_delta(basic_str, native_str)};
-            auto merged_str{neu::merge_str(basic_str, delta)};
-#if 0
-            std::cout << "merged_str: " << merged_str << '\n';
-#endif
-            if (merged_str == native_str)
-            {
-                std::cout << "merge correct\n";
-            }
-            else
-            {
-                std::cout << "merge error\n";
-            }
+        if (native_str != merged_str)
+        {
+            std::cerr << "merge error\n";
+            assert(false);
         }
     }
-
     return 0;
 }
