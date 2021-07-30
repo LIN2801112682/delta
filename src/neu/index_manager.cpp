@@ -52,6 +52,7 @@ namespace neu
                 if (token != true_value)
                 {
                     const auto &node{delta[delta_idx]};
+                    std::cout << "doc_id: " << doc_id << '\n';
                     std::cout << "basic_str: " << basic_str_ << '\n';
                     std::cout << "merged_str: " << merged_str << '\n';
                     std::cout << "  delta_idx: " << delta_idx << '\n';

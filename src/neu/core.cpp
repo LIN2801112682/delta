@@ -376,7 +376,7 @@ namespace neu
                     if (check_dlm_func(ch))
                     {
                         has_right_split = true;
-                        partial_merged_str.append(basic_str_v.substr(basic_right_left_offset + i - 1, i));
+                        partial_merged_str.append(basic_str_v.substr(basic_right_left_offset, i));
                         break;
                     }
                 }
