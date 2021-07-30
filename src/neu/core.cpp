@@ -443,9 +443,7 @@ namespace neu
                 break;
             }
         }
-#if 0
-            std::cout << "  mid: " << mid << " native_left_right_offset: " << native_left_right_offset << " partial_merged_str: " << partial_merged_str << '\n';
-#endif
+
         return {partial_merged_str, native_left_right_offset + 1};
     }
 
