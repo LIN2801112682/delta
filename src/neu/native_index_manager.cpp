@@ -1,5 +1,5 @@
 #include "neu/native_index_manager.h"
-#include "neu/split_str.hpp"
+#include "utils/split_str.hpp"
 #include <iostream>
 #include <regex>
 
@@ -9,9 +9,13 @@ namespace neu
     native_index_manager_t::add_native_index(const doc_id_t doc_id, str_v_t native_str_v)
     {
         split_str_t split_str{native_str_v, is_es_dlm};
-        while (split_str.has_next())
+        while (true)
         {
-            auto [token, offset]{split_str.get_next()};
+            auto [has_next, token, offset]{split_str.get_next()};
+            if (!has_next)
+            {
+                break;
+            }
             auto &doc_id_umap{native_inverted_index_[token]};
             auto &offset_uset{doc_id_umap[doc_id]};
             offset_uset.emplace(offset);

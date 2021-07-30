@@ -1,23 +1,22 @@
 #include "neu/delta_index_manager.h"
-#include "neu/split_str.hpp"
+#include "utils/split_str.hpp"
 #include <iostream>
 #include <regex>
+#include <functional>
 
 namespace neu
 {
     delta_index_manager_t::delta_index_manager_t(str_v_t basic_str)
         : basic_str_{basic_str}
     {
-#if 0
-        std::cout << "basic_str_: " << basic_str_ << '\n';
-#endif
         split_str_t split_str{basic_str_, is_es_dlm};
-        while (split_str.has_next())
+        while (true)
         {
-            auto [token, offset]{split_str.get_next()};
-#if 0
-            std::cout << "  token: " << token << " offset: " << offset << '\n';
-#endif
+            auto [has_next, token, offset]{split_str.get_next()};
+            if (!has_next)
+            {
+                break;
+            }
             auto &doc_id_umap{basic_inverted_index_[token]};
             auto &offset_uset{doc_id_umap[k_basic_doc_id]};
             offset_uset.emplace(offset);
@@ -27,13 +26,17 @@ namespace neu
     void
     delta_index_manager_t::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
-#if 0
+#if 1
         auto merged_str{merge_str(basic_str_, delta)};
         std::unordered_map<offset_t, str_t> umap{};
         split_str_t split_str_m{merged_str, is_es_dlm};
-        while (split_str_m.has_next())
+        while (true)
         {
-            auto [token, offset]{split_str_m.get_next()};
+            auto [has_next, token, offset]{split_str_m.get_next()};
+            if (!has_next)
+            {
+                break;
+            }
             umap[offset] = token;
         }
 #endif
@@ -41,13 +44,17 @@ namespace neu
         {
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
             split_str_t split_str{partial_merged_str, is_es_dlm};
-            while (split_str.has_next())
+            while (true)
             {
-                auto [token, relative_offset]{split_str.get_next()};
+                auto [has_next, token, relative_offset]{split_str.get_next()};
+                if (!has_next)
+                {
+                    break;
+                }
                 auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset + relative_offset);
-#if 0
+#if 1
                 const auto &true_value{umap[offset + relative_offset]};
                 if (token != true_value)
                 {

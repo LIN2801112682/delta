@@ -29,13 +29,13 @@ load_all_line(std::string_view path)
         ifs.close();
     };
 
-    std::vector<std::string> all_str{};
+    std::vector<std::string> str_vec{};
     std::string str{};
     while (getline(ifs, str))
     {
-        all_str.emplace_back(std::move(str));
+        str_vec.emplace_back(std::move(str));
     }
-    return all_str;
+    return str_vec;
 }
 
 #endif

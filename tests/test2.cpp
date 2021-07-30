@@ -3,15 +3,13 @@
 #include "neu/native_index_manager.h"
 #include "utils/file_handler.hpp"
 #include "utils/scope_exit.hpp"
-#include <string>
 #include <iostream>
-#include <fstream>
 #include <algorithm>
 #include <chrono>
 
-static const std::string basic_file_path{"../resources/chr3.txt"};
-static const std::string native_file_path{"../resources/query2.txt"};
-static const std::string regex_file_path{"../resources/regex-query"};
+static constexpr auto basic_file_path{"../resources/chr3.txt"};
+static constexpr auto native_file_path{"../resources/query2.txt"};
+static constexpr auto regex_file_path{"../resources/regex-query"};
 
 int main()
 {
@@ -81,10 +79,18 @@ int main()
             };
 #endif
             auto delta_result{delta_index_manager.regex_query(regex_str)};
+#if 0
+            std::cout << "delta_result_count: " << delta_result.size() << '\n';
+#endif
+#if 1
             auto native_result{native_index_manager.regex_query(regex_str)};
-            std::cout << "delta_result_count: " << delta_result.size() << '\n'
-                      << "native_result_count: " << native_result.size() << '\n';
+            if (delta_result != native_result)
+            {
+                std::cerr << "delta_result_count: " << delta_result.size() << '\n';
+                std::cerr << "native_result_count: " << native_result.size() << '\n';
+            }
+#endif
         });
-
+    std::cout << "index correct.\n";
     return 0;
 }
