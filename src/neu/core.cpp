@@ -267,12 +267,8 @@ namespace neu
                     if (check_dlm_func(ch))
                     {
                         has_left_split = true;
-                        if (idx == 5)
-                        {
-                            std::cout << "11111111: " << basic_str_v.substr(basic_left_right_offset - (i - 1), i) << "-----\n";
-                        }
-                        partial_merged_str.insert(0, basic_str_v.substr(basic_left_right_offset - (i - 1), i));
-                        native_left_right_offset = native_left_right_offset - i; // todo
+                        partial_merged_str.insert(0, basic_str_v.substr(basic_left_right_offset - i + 1, i));
+                        native_left_right_offset -= i;
                         break;
                     }
                 }

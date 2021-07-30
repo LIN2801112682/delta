@@ -27,30 +27,32 @@ namespace neu
     void
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
+#if 1
+        std::cout << "basic_str: " << basic_str_ << '\n';
+        auto merged_str{merge_str(basic_str_, delta)};
+        std::cout << "merged_str: " << merged_str << '\n';
+        std::unordered_map<offset_t, str_t> umap{};
+        split_str_t split_str_m{merged_str, is_es_dlm};
+        while (split_str_m.has_next())
+        {
+            auto [token, offset]{split_str_m.get_next()};
+            umap[offset] = token;
+        }
+#endif
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
-            auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
 #if 1
-            auto merged_str{merge_str(basic_str_, delta)};
-            if (partial_merged_str[0] != merged_str[offset])
-            {
-                const auto &node{delta[delta_idx]};
-                std::cout << "delta_idx: " << delta_idx << '\n';
-                std::cout << "basic_str: " << basic_str_ << '\n';
-                std::cout << "merged_str: " << merged_str << '\n';
-                std::cout << "delta:\n";
-                std::cout << "  node:\n";
-                std::cout << "      content: " << node.content_ << '\n';
-                std::cout << "      low: " << node.low_ << '\n';
-                std::cout << "      high: " << node.low_ << '\n';
-                std::cout << "      native_left_right_offset: " << node.native_right_left_offset_ << '\n';
-                std::cout << "      type: " << static_cast<int>(node.type_) << '\n';
-                std::cout << "  partial_merged_str: " << partial_merged_str << '\n';
-                std::cout << "  aaa: " << basic_str_.substr(delta[delta_idx].low_) << '\n';
-                std::cout << "  bbb: " << merged_str.substr(delta[delta_idx].native_right_left_offset_ + 1) << '\n';
-                std::cout << "  ccc: " << merged_str.substr(offset) << '\n';
-            }
+            const auto &node{delta[delta_idx]};
+            std::cout << "  delta_idx: " << delta_idx << '\n';
+            std::cout << "  delta:\n";
+            std::cout << "      node:\n";
+            std::cout << "          content: " << node.content_ << '\n';
+            std::cout << "          low: " << node.low_ << '\n';
+            std::cout << "          high: " << node.low_ << '\n';
+            std::cout << "          native_left_right_offset: " << node.native_right_left_offset_ << '\n';
+            std::cout << "          type: " << static_cast<int>(node.type_) << '\n';
 #endif
+            auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
             split_str_t split_str{partial_merged_str, is_es_dlm};
             while (split_str.has_next())
             {
@@ -58,6 +60,12 @@ namespace neu
                 auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset + relative_offset);
+#if 1
+                const auto &true_value{umap[offset + relative_offset]};
+                std::cout << "      true_value: " << true_value << '\n';
+                std::cout << "      token: " << token << '\n';
+                assert(true_value == token);
+#endif
             }
         }
         delta_umap_.emplace(doc_id, std::move(delta));
