@@ -1,11 +1,11 @@
-#include "neu/index_manager.h"
+#include "neu/native_index_manager.h"
 #include "neu/split_str.hpp"
 #include <iostream>
 #include <regex>
 
 namespace neu
 {
-    index_manager::index_manager(str_v_t basic_str)
+    native_index_manager::native_index_manager(str_v_t basic_str)
         : basic_str_{basic_str}
     {
 #if 0
@@ -25,7 +25,7 @@ namespace neu
     }
 
     void
-    index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
+    native_index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
 #if 0
         auto merged_str{merge_str(basic_str_, delta)};
@@ -80,7 +80,7 @@ namespace neu
     };
 
     doc_id_umap_t
-    index_manager::regex_query(const str_t &regex_str)
+    native_index_manager::regex_query(const str_t &regex_str)
     {
         doc_id_umap_t result{};
         std::regex pattern{regex_str};

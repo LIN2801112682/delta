@@ -1,5 +1,5 @@
 #include "neu/core.h"
-#include "neu/index_manager.h"
+#include "neu/delta_index_manager.h"
 #include "utils/scope_exit.hpp"
 #include <string>
 #include <iostream>
@@ -28,7 +28,7 @@ int main()
 #endif
     }
 
-    neu::index_manager manager{basic_str};
+    neu::delta_index_manager manager{basic_str};
     {
         std::ifstream native_ifs{native_file_path, std::ios::in};
         SCOPE_GUARD
@@ -37,7 +37,7 @@ int main()
         };
 
         neu::str_t native_str{};
-        neu::doc_id_t doc_id{neu::index_manager::k_basic_doc_id};
+        neu::doc_id_t doc_id{neu::delta_index_manager::k_basic_doc_id};
         while (getline(native_ifs, native_str))
         {
             std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
