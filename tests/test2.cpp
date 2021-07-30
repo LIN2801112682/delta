@@ -71,6 +71,18 @@ int main()
         auto native_result{native_index_manager.regex_query(regex_str)};
         std::cerr << "delta_result_count: " << delta_result.size() << '\n';
         std::cerr << "native_result_count: " << native_result.size() << '\n';
+        for (const auto &[doc_id, offset_uset] : native_result) 
+        {
+            if (delta_result.count(doc_id) != 1)
+            {
+                //std::cout << "doc_id: " << doc_id << '\n';
+                std::cout << "native_str: " << native_str_vec[doc_id] << '\n';
+                for (const auto &offset : offset_uset)
+                {
+                    std::cout << "  offset: " << offset << '\n';
+                }
+            }
+        }
     }
 
     std::cout << "index correct.\n";
