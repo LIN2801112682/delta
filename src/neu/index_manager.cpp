@@ -28,9 +28,7 @@ namespace neu
     index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
 #if 1
-        std::cout << "basic_str: " << basic_str_ << '\n';
         auto merged_str{merge_str(basic_str_, delta)};
-        std::cout << "merged_str: " << merged_str << '\n';
         std::unordered_map<offset_t, str_t> umap{};
         split_str_t split_str_m{merged_str, is_es_dlm};
         while (split_str_m.has_next())
@@ -42,15 +40,6 @@ namespace neu
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
 #if 1
-            const auto &node{delta[delta_idx]};
-            std::cout << "  delta_idx: " << delta_idx << '\n';
-            std::cout << "  delta:\n";
-            std::cout << "      node:\n";
-            std::cout << "          content: " << node.content_ << '\n';
-            std::cout << "          low: " << node.low_ << '\n';
-            std::cout << "          high: " << node.low_ << '\n';
-            std::cout << "          native_left_right_offset: " << node.native_right_left_offset_ << '\n';
-            std::cout << "          type: " << static_cast<int>(node.type_) << '\n';
 #endif
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
             split_str_t split_str{partial_merged_str, is_es_dlm};
@@ -62,9 +51,23 @@ namespace neu
                 offset_uset.emplace(offset + relative_offset);
 #if 1
                 const auto &true_value{umap[offset + relative_offset]};
-                std::cout << "      true_value: " << true_value << '\n';
-                std::cout << "      token: " << token << '\n';
-                assert(true_value == token);
+                if (token != true_value)
+                {
+                    const auto &node{delta[delta_idx]};
+                    std::cout << "basic_str: " << basic_str_ << '\n';
+                    std::cout << "merged_str: " << merged_str << '\n';
+                    std::cout << "  delta_idx: " << delta_idx << '\n';
+                    std::cout << "  delta:\n";
+                    std::cout << "      node:\n";
+                    std::cout << "          content: " << node.content_ << '\n';
+                    std::cout << "          low: " << node.low_ << '\n';
+                    std::cout << "          high: " << node.low_ << '\n';
+                    std::cout << "          native_left_right_offset: " << node.native_right_left_offset_ << '\n';
+                    std::cout << "          type: " << static_cast<int>(node.type_) << '\n';
+                    std::cout << "  partial_merged_str: " << partial_merged_str << '\n';
+                    std::cout << "      true_value: " << true_value << '\n';
+                    std::cout << "      token: " << token << '\n';
+                }
 #endif
             }
         }
