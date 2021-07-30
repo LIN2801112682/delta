@@ -274,11 +274,11 @@ namespace neu
                         if (has_left_split)
                         {
                             bool has_right_split{false};
-                            if (token_offset.offset + token_offset.token.size() < basic_right_offset)
+                            if (token_offset.offset + token_offset.token.size() - 1 < basic_right_offset)
                             {
                                 has_right_split = true;
                             }
-                            else if (token_offset.offset + token_offset.token.size() == basic_right_offset)
+                            else if (token_offset.offset + token_offset.token.size() - 1 == basic_right_offset)
                             {
                                 auto right{mid + 1};
                                 if (delta.size() - 1 < right)
