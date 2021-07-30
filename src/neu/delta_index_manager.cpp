@@ -28,7 +28,7 @@ namespace neu
     void
     delta_index_manager_t::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
-#if 1
+#if 0
         auto merged_str{merge_str(basic_str_, delta)};
         std::unordered_map<offset_t, str_t> umap{};
         split_str_t split_str_m{merged_str, check_dlm_func_};
@@ -56,7 +56,7 @@ namespace neu
                 auto &doc_id_umap{delta_inverted_index_[token]};
                 auto &offset_uset{doc_id_umap[doc_id]};
                 offset_uset.emplace(offset + relative_offset);
-#if 1
+#if 0
                 const auto &true_value{umap[offset + relative_offset]};
                 if (token != true_value)
                 {

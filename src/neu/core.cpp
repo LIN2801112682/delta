@@ -37,9 +37,7 @@ namespace neu
                 }
             }
         }
-#if 0
-        std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
-#endif
+        // std::cout << "distance: " << dp[basic_str_size][native_str_size] << '\n';
 
         std::stack<node_t> node_stack{};
         auto basic_str_offset{basic_str_size};
@@ -48,9 +46,8 @@ namespace neu
         {
             if (native_str_offset > 0 && dp[basic_str_offset][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
-#if 0
-                std::cout << "insert: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
-#endif
+                //std::cout << "insert: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+
                 node_t node{
                     .content_ = str_t{native_str_v[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
@@ -77,9 +74,8 @@ namespace neu
             }
             else if (basic_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset] + 1 == dp[basic_str_offset][native_str_offset])
             {
-#if 0
-                std::cout << "delete: " << basic_str_v[basic_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
-#endif
+                // std::cout << "delete: " << basic_str_v[basic_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+
                 node_t node{
                     .content_ = {},
                     .low_ = basic_str_offset - 1,
@@ -106,9 +102,8 @@ namespace neu
             }
             else if (basic_str_offset > 0 && native_str_offset > 0 && dp[basic_str_offset - 1][native_str_offset - 1] + 1 == dp[basic_str_offset][native_str_offset])
             {
-#if 0
-                std::cout << "replace: " << basic_str_v[basic_str_offset - 1] << " to: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
-#endif
+                // std::cout << "replace: " << basic_str_v[basic_str_offset - 1] << " to: " << native_str_v[native_str_offset - 1] << " at: " << basic_str_offset - 1 << '\n';
+
                 node_t node{
                     .content_ = str_t{native_str_v[native_str_offset - 1]},
                     .low_ = basic_str_offset - 1,
