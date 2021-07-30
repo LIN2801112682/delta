@@ -9,16 +9,12 @@ namespace neu
     class native_index_manager
     {
     public:
-        static constexpr doc_id_t k_basic_doc_id{0};
-        native_index_manager(str_v_t basic_str_v);
-        void add_delta_index(const doc_id_t doc_id, delta_t &&delta);
+        native_index_manager();
+        void add_native_index(const doc_id_t doc_id, str_v_t native_str_v);
         doc_id_umap_t regex_query(const str_t &regex_str);
 
     private:
-        const str_t basic_str_;
-        std::unordered_map<doc_id_t, delta_t> delta_umap_{};
-        std::unordered_map<str_t, doc_id_umap_t> basic_inverted_index_{};
-        std::unordered_map<str_t, doc_id_umap_t> delta_inverted_index_{};
+        std::unordered_map<str_t, doc_id_umap_t> native_inverted_index_{};
     };
 };
 
