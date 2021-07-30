@@ -11,12 +11,13 @@ public:
         : str_{str_v},
           check_dlm_func_{check_dlm_func} {}
 
-    std::tuple<bool, std::string, std::string::size_type> get_next()
+    std::tuple<bool, std::string, std::string::size_type>
+    get_next()
     {
         std::string::size_type begin{};
         std::string::size_type end{};
         auto is_find_begin{false};
-        for (; offset_ < str_.size(); ++offset_)
+        while (offset_ < str_.size())
         {
             const char &ch{str_[offset_]};
             if (!check_dlm_func_(ch))
@@ -30,10 +31,10 @@ public:
             }
             if ((check_dlm_func_(ch) || offset_ == str_.size() - 1) && is_find_begin)
             {
-                is_find_begin = false;
                 ++offset_;
                 return {true, str_.substr(begin, end - begin + 1), begin};
             }
+            ++offset_;
         }
         return {false, {}, {}};
     }
