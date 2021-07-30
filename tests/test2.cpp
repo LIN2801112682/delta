@@ -69,8 +69,13 @@ int main()
 #endif
         auto delta_result{delta_index_manager.regex_query(regex_str)};
         auto native_result{native_index_manager.regex_query(regex_str)};
-        std::cerr << "delta_result_count: " << delta_result.size() << '\n';
-        std::cerr << "native_result_count: " << native_result.size() << '\n';
+        if (delta_result.size() != native_result.size())
+        {
+            std::cerr << "delta_result_count: " << delta_result.size() << '\n';
+            std::cerr << "native_result_count: " << native_result.size() << '\n';
+        }
+
+        /*
         for (const auto &[doc_id, offset_uset] : native_result) 
         {
             if (delta_result.count(doc_id) != 1)
@@ -83,6 +88,7 @@ int main()
                 }
             }
         }
+        */
     }
 
     std::cout << "index correct.\n";
