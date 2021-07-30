@@ -82,12 +82,6 @@ namespace neu
         delta_umap_.emplace(doc_id, std::move(delta));
     }
 
-    struct token_offset_t
-    {
-        str_t token;
-        offset_t offset;
-    };
-
     doc_id_umap_t
     delta_index_manager_t::regex_query(const str_t &regex_str)
     {
@@ -113,8 +107,7 @@ namespace neu
                 }
             }
         }
-        std::sort(std::begin(token_offset_vec),
-                  std::end(token_offset_vec),
+        std::sort(std::begin(token_offset_vec), std::end(token_offset_vec),
                   [](const auto &lhs, const auto &rhs)
                   {
                       return lhs.offset < rhs.offset;
