@@ -88,25 +88,37 @@ namespace neu
             {
                 if (delta_inverted_index_.count(token) != 1)
                 {
+                    std::cout << "1\n";
+                    std::cout << "basic_str: " << basic_str_ << '\n';
+                    std::cout << "merged_str: " << merged_str << '\n';
                     std::cout << "miss token: " << token << '\n';
                     std::cout << "miss doc_id: " << doc_id << '\n';
-                    std::cout << "miss offset: " << offset << '\n';
+                    std::cout << "miss offset: " << offset << '\n'
+                              << '\n';
                 }
                 else
                 {
                     if (delta_inverted_index_[token].count(doc_id) != 1)
                     {
+                        std::cout << "2\n";
+                        std::cout << "basic_str: " << basic_str_ << '\n';
+                        std::cout << "merged_str: " << merged_str << '\n';
                         std::cout << "miss token: " << token << '\n';
                         std::cout << "miss doc_id: " << doc_id << '\n';
-                        std::cout << "miss offset: " << offset << '\n';
+                        std::cout << "miss offset: " << offset << '\n'
+                                  << '\n';
                     }
                     else
                     {
                         if (delta_inverted_index_[token][doc_id].count(offset) != 1)
                         {
+                            std::cout << "3\n";
+                            std::cout << "basic_str: " << basic_str_ << '\n';
+                            std::cout << "merged_str: " << merged_str << '\n';
                             std::cout << "miss token: " << token << '\n';
                             std::cout << "miss doc_id: " << doc_id << '\n';
-                            std::cout << "miss offset: " << offset << '\n';
+                            std::cout << "miss offset: " << offset << '\n'
+                                      << '\n';
                         }
                     }
                 }
