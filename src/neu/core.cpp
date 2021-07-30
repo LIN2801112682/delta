@@ -189,18 +189,18 @@ namespace neu
     }
 
     std::tuple<str_t, offset_t>
-    partial_merge_str(str_v_t basic_str_v, const delta_t &delta, const size_t idx, const check_dlm_func_t &check_dlm_func)
+    partial_merge_str(str_v_t basic_str_v, const delta_t &delta, const size_t delta_idx, const check_dlm_func_t &check_dlm_func)
     {
         str_t partial_merged_str{};
 
-        auto mid{static_cast<std::make_signed_t<size_t>>(idx)};
+        auto mid{static_cast<std::make_signed_t<size_t>>(delta_idx)};
         auto left{mid - 1};
         auto right{mid + 1};
-        offset_t native_left_right_offset{0};
-        offset_t basic_left_left_offset{0};
-        offset_t basic_left_right_offset{0};
-        offset_t basic_right_left_offset{0};
-        offset_t basic_right_right_offset{0};
+        offset_t native_left_right_offset{};
+        offset_t basic_left_left_offset{};
+        offset_t basic_left_right_offset{};
+        offset_t basic_right_left_offset{};
+        offset_t basic_right_right_offset{};
         auto has_left_split{false};
         auto has_right_split{false};
 
