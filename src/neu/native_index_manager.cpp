@@ -5,10 +5,13 @@
 
 namespace neu
 {
+    native_index_manager_t::native_index_manager_t(const check_dlm_func_t &check_dlm_func)
+        : check_dlm_func_{check_dlm_func} {}
+
     void
     native_index_manager_t::add_native_index(const doc_id_t doc_id, str_v_t native_str_v)
     {
-        split_str_t split_str{native_str_v, is_es_dlm};
+        split_str_t split_str{native_str_v, check_dlm_func_};
         while (true)
         {
             auto [has_next, token, offset]{split_str.get_next()};

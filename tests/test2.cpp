@@ -33,8 +33,24 @@ int main()
                 tolower);
         });
 
-    neu::delta_index_manager_t delta_index_manager{basic_str};
-    neu::native_index_manager_t native_index_manager{};
+    auto is_es_dlm = [](const neu::ch_t ch)
+    {
+        switch (ch)
+        {
+        case ' ':
+        case '.':
+        case '\'':
+        case '\"':
+        case '(':
+        case ')':
+            return true;
+        default:
+            return false;
+        }
+    };
+
+    neu::delta_index_manager_t delta_index_manager{basic_str, is_es_dlm};
+    neu::native_index_manager_t native_index_manager{is_es_dlm};
     neu::doc_id_t doc_id{0};
     std::for_each(
         std::cbegin(native_str_vec),

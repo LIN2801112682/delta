@@ -447,20 +447,4 @@ namespace neu
         return {partial_merged_str, native_left_right_offset + 1};
     }
 
-    bool
-    is_es_dlm(const ch_t ch)
-    {
-        switch (ch)
-        {
-        case ' ':
-        case '.':
-        case '\'':
-        case '\"':
-        case '(':
-        case ')':
-            return true;
-        default:
-            return false;
-        }
-    }
 };

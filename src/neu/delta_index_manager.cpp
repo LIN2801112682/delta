@@ -1,15 +1,17 @@
 #include "neu/delta_index_manager.h"
+#include "neu/core.h"
 #include "utils/split_str.hpp"
-#include <iostream>
 #include <regex>
 #include <functional>
+#include <iostream>
 
 namespace neu
 {
-    delta_index_manager_t::delta_index_manager_t(str_v_t basic_str)
-        : basic_str_{basic_str}
+    delta_index_manager_t::delta_index_manager_t(str_v_t basic_str, const check_dlm_func_t &check_dlm_func)
+        : basic_str_{basic_str},
+        check_dlm_func_{check_dlm_func}
     {
-        split_str_t split_str{basic_str_, is_es_dlm};
+        split_str_t split_str{basic_str_, check_dlm_func_};
         while (true)
         {
             auto [has_next, token, offset]{split_str.get_next()};
@@ -29,7 +31,7 @@ namespace neu
 #if 1
         auto merged_str{merge_str(basic_str_, delta)};
         std::unordered_map<offset_t, str_t> umap{};
-        split_str_t split_str_m{merged_str, is_es_dlm};
+        split_str_t split_str_m{merged_str, check_dlm_func_};
         while (true)
         {
             auto [has_next, token, offset]{split_str_m.get_next()};
@@ -42,8 +44,8 @@ namespace neu
 #endif
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
-            auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
-            split_str_t split_str{partial_merged_str, is_es_dlm};
+            auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, check_dlm_func_)};
+            split_str_t split_str{partial_merged_str, check_dlm_func_};
             while (true)
             {
                 auto [has_next, token, relative_offset]{split_str.get_next()};
@@ -172,7 +174,7 @@ namespace neu
                                 switch (left_node.type_)
                                 {
                                 case node_type_enum::insert:
-                                    if (is_es_dlm(left_node.content_[left_node.content_.size() - 1]))
+                                    if (check_dlm_func_(left_node.content_[left_node.content_.size() - 1]))
                                     {
                                         has_left_split = true;
                                     }
@@ -184,13 +186,13 @@ namespace neu
                                     {
                                         has_left_split = true;
                                     }
-                                    if (0 <= pre_offset && is_es_dlm(basic_str_[pre_offset]))
+                                    if (0 <= pre_offset && check_dlm_func_(basic_str_[pre_offset]))
                                     {
                                         has_left_split = true;
                                     }
                                     break;
                                 case node_type_enum::replace:
-                                    if (is_es_dlm(left_node.content_[left_node.content_.size() - 1]))
+                                    if (check_dlm_func_(left_node.content_[left_node.content_.size() - 1]))
                                     {
                                         has_left_split = true;
                                     }
@@ -223,7 +225,7 @@ namespace neu
                                     switch (right_node.type_)
                                     {
                                     case node_type_enum::insert:
-                                        if (is_es_dlm(right_node.content_[0]))
+                                        if (check_dlm_func_(right_node.content_[0]))
                                         {
                                             has_right_split = true;
                                         }
@@ -235,13 +237,13 @@ namespace neu
                                         {
                                             has_right_split = true;
                                         }
-                                        if (post_offset <= basic_str_.size() - 1 && is_es_dlm(basic_str_[post_offset]))
+                                        if (post_offset <= basic_str_.size() - 1 && check_dlm_func_(basic_str_[post_offset]))
                                         {
                                             has_right_split = true;
                                         }
                                         break;
                                     case node_type_enum::replace:
-                                        if (is_es_dlm(right_node.content_[0]))
+                                        if (check_dlm_func_(right_node.content_[0]))
                                         {
                                             has_right_split = true;
                                         }
@@ -322,7 +324,7 @@ namespace neu
                                 switch (left_node.type_)
                                 {
                                 case node_type_enum::insert:
-                                    if (is_es_dlm(left_node.content_[left_node.content_.size() - 1]))
+                                    if (check_dlm_func_(left_node.content_[left_node.content_.size() - 1]))
                                     {
                                         has_left_split = true;
                                     }
@@ -330,13 +332,13 @@ namespace neu
                                 case node_type_enum::deletE:
                                     // ignore continuial detla situation, todo
                                     pre_offset = left_node.low_ - 1;
-                                    if (0 <= pre_offset && is_es_dlm(basic_str_[pre_offset]))
+                                    if (0 <= pre_offset && check_dlm_func_(basic_str_[pre_offset]))
                                     {
                                         has_left_split = true;
                                     }
                                     break;
                                 case node_type_enum::replace:
-                                    if (is_es_dlm(left_node.content_[left_node.content_.size() - 1]))
+                                    if (check_dlm_func_(left_node.content_[left_node.content_.size() - 1]))
                                     {
                                         has_left_split = true;
                                     }
