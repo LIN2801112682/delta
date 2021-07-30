@@ -16,66 +16,61 @@ static const std::string regex_file_path{"../resources/regex-query"};
 int main()
 {
     auto basic_str{load_first_line(basic_file_path)};
-    std::transform(std::begin(basic_str), std::end(basic_str), std::begin(basic_str), tolower);
-#if 1
-    std::cout << "basic_str: " << basic_str << '\n';
-#endif
+    std::transform(
+        std::begin(basic_str),
+        std::end(basic_str),
+        std::begin(basic_str),
+        tolower);
 
     auto native_str_vec{load_all_line(native_file_path)};
-    for (auto &native_str : native_str_vec)
-    {
-        std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
-#if 1
-        std::cout << "native_str: " << native_str << '\n';
-#endif
-    }
-
-    neu::delta_index_manager manager{basic_str};
-
-
-    {
-        std::ifstream native_ifs{native_file_path, std::ios::in};
-        SCOPE_GUARD
+    std::for_each(
+        std::begin(native_str_vec),
+        std::end(native_str_vec),
+        [](auto &native_str)
         {
-            native_ifs.close();
-        };
+            std::transform(
+                std::begin(native_str),
+                std::end(native_str),
+                std::begin(native_str),
+                tolower);
+        });
 
-        neu::str_t native_str{};
-        neu::doc_id_t doc_id{neu::delta_index_manager::k_basic_doc_id};
-        while (getline(native_ifs, native_str))
+    neu::delta_index_manager_t delta_index_manager{basic_str};
+    neu::native_index_manager_t native_index_manager{};
+    neu::doc_id_t doc_id{0};
+    std::for_each(
+        std::cbegin(native_str_vec),
+        std::cend(native_str_vec),
+        [&basic_str,
+         &delta_index_manager,
+         &native_index_manager,
+         &doc_id](const auto &native_str)
         {
-            std::transform(std::begin(native_str), std::end(native_str), std::begin(native_str), tolower);
+            delta_index_manager.add_delta_index(doc_id, neu::extract_delta(basic_str, native_str));
+            native_index_manager.add_native_index(doc_id, native_str);
+            doc_id++;
+        });
+
+    auto regex_str_vec{load_all_line(regex_file_path)};
+    std::for_each(
+        std::begin(regex_str_vec),
+        std::end(regex_str_vec),
+        [](auto &regex_str)
+        {
+            std::transform(
+                std::begin(regex_str),
+                std::end(regex_str),
+                std::begin(regex_str),
+                tolower);
+        });
+
+    std::for_each(
+        std::cbegin(regex_str_vec),
+        std::cend(regex_str_vec),
+        [&delta_index_manager,
+         &native_index_manager](const auto &regex_str)
+        {
 #if 0
-            std::cout << "native_str: " << native_str << '\n';
-#endif
-
-            auto delta{neu::extract_delta(basic_str, native_str)};
-            manager.add_delta_index(++doc_id, std::move(delta));
-        }
-    }
-
-    std::vector<neu::str_t> regex_str_vec{};
-    {
-        std::ifstream regex_ifs{regex_file_path, std::ios::in};
-        SCOPE_GUARD
-        {
-            regex_ifs.close();
-        };
-
-        neu::str_t regex_str{};
-        while (getline(regex_ifs, regex_str))
-        {
-            std::transform(std::begin(regex_str), std::end(regex_str), std::begin(regex_str), tolower);
-#if 0
-            std::cout << "regex_str: " << regex_str << '\n';
-#endif
-            regex_str_vec.emplace_back(regex_str);
-        }
-    }
-
-    for (const auto &regex_str : regex_str_vec)
-    {
-        {
             auto begin_time{std::chrono::high_resolution_clock::now()};
             SCOPE_GUARD
             {
@@ -84,11 +79,12 @@ int main()
                 auto program_times = elapsed_time.count();
                 std::cout << " time: " << program_times << " microseconds\n";
             };
-
-            auto result{manager.regex_query(regex_str)};
-            std::cout << "  delta_result_count: " << result.size();
-        }
-    }
+#endif
+            auto delta_result{delta_index_manager.regex_query(regex_str)};
+            auto native_result{native_index_manager.regex_query(regex_str)};
+            std::cout << "delta_result_count: " << delta_result.size() << '\n'
+                      << "native_result_count: " << native_result.size() << '\n';
+        });
 
     return 0;
 }

@@ -6,10 +6,9 @@
 
 namespace neu
 {
-    class native_index_manager
+    class native_index_manager_t
     {
     public:
-        native_index_manager();
         void add_native_index(const doc_id_t doc_id, str_v_t native_str_v);
         doc_id_umap_t regex_query(const str_t &regex_str);
 

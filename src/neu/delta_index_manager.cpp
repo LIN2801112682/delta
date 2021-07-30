@@ -5,7 +5,7 @@
 
 namespace neu
 {
-    delta_index_manager::delta_index_manager(str_v_t basic_str)
+    delta_index_manager_t::delta_index_manager_t(str_v_t basic_str)
         : basic_str_{basic_str}
     {
 #if 0
@@ -25,7 +25,7 @@ namespace neu
     }
 
     void
-    delta_index_manager::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
+    delta_index_manager_t::add_delta_index(const doc_id_t doc_id, delta_t &&delta)
     {
 #if 0
         auto merged_str{merge_str(basic_str_, delta)};
@@ -80,7 +80,7 @@ namespace neu
     };
 
     doc_id_umap_t
-    delta_index_manager::regex_query(const str_t &regex_str)
+    delta_index_manager_t::regex_query(const str_t &regex_str)
     {
         doc_id_umap_t result{};
         std::regex pattern{regex_str};

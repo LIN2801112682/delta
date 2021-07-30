@@ -1,15 +1,16 @@
 #include "neu/core.h"
 #include "utils/file_handler.hpp"
 #include <iostream>
-#include <string>
 
-static const std::string basic_file_path{"../resources/chr3.txt"};
-static const std::string native_file_path{"../resources/query2.txt"};
+static constexpr auto basic_file_path{"../resources/chr3.txt"};
+static constexpr auto native_file_path{"../resources/query2.txt"};
 
 int main()
 {
     auto basic_str{load_first_line(basic_file_path)};
+
     auto native_str_vec{load_all_line(native_file_path)};
+
     for (const auto &native_str : native_str_vec)
     {
         auto delta{neu::extract_delta(basic_str, native_str)};
@@ -22,5 +23,6 @@ int main()
             assert(false);
         }
     }
+    std::cout << "merge correct.\n";
     return 0;
 }

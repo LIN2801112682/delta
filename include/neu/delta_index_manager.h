@@ -6,11 +6,11 @@
 
 namespace neu
 {
-    class delta_index_manager
+    class delta_index_manager_t
     {
     public:
         static constexpr doc_id_t k_basic_doc_id{0};
-        delta_index_manager(str_v_t basic_str_v);
+        delta_index_manager_t(str_v_t basic_str_v);
         void add_delta_index(const doc_id_t doc_id, delta_t &&delta);
         doc_id_umap_t regex_query(const str_t &regex_str);
 

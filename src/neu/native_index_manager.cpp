@@ -6,7 +6,7 @@
 namespace neu
 {
     void
-    native_index_manager::add_native_index(const doc_id_t doc_id, str_v_t native_str_v)
+    native_index_manager_t::add_native_index(const doc_id_t doc_id, str_v_t native_str_v)
     {
         split_str_t split_str{native_str_v, is_es_dlm};
         while (split_str.has_next())
@@ -19,7 +19,7 @@ namespace neu
     }
 
     doc_id_umap_t
-    native_index_manager::regex_query(const str_t &regex_str)
+    native_index_manager_t::regex_query(const str_t &regex_str)
     {
         doc_id_umap_t result{};
         std::regex pattern{regex_str};
