@@ -209,9 +209,9 @@ namespace neu
             basic_right_left_offset = node.high_;
             /*
             can't judge in here. eg:
-            [_ab_]cde[_fg_], [_]abc[_def], [abc_]def[_hij]...
+            [_abc_]def[_ghi_], [_]abc[_def], [abc_]def[_ghi], |abc[_def], [abc_]def|...
             */
-            // has_left_split = check_dlm_func(partial_merged_str[0]); 
+            //has_left_split = check_dlm_func(partial_merged_str[0]); 
             // has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
             break;
         case node_type_enum::deletE:
@@ -224,7 +224,7 @@ namespace neu
             native_left_right_offset = node.native_right_left_offset_;
             basic_left_right_offset = node.low_ - 1;
             basic_right_left_offset = node.high_ + 1;
-            // has_left_split = check_dlm_func(partial_merged_str[0]);
+            //has_left_split = check_dlm_func(partial_merged_str[0]);
             // has_right_split = check_dlm_func(partial_merged_str[partial_merged_str.size() - 1]);
             break;
         default:
