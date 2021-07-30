@@ -39,8 +39,6 @@ namespace neu
 #endif
         for (size_t delta_idx{0}; delta_idx < delta.size(); ++delta_idx)
         {
-#if 1
-#endif
             auto [partial_merged_str, offset]{partial_merge_str(basic_str_, delta, delta_idx, is_es_dlm)};
             split_str_t split_str{partial_merged_str, is_es_dlm};
             while (split_str.has_next())

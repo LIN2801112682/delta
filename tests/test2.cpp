@@ -69,6 +69,7 @@ int main()
         }
     }
 
+    /*
     for (const auto &regex_str : regex_str_vec)
     {
         {
@@ -85,6 +86,7 @@ int main()
             std::cout << "  delta_result_count: " << result.size();
         }
     }
+    */
 
     return 0;
 }
