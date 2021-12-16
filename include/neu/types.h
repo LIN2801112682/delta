@@ -48,10 +48,9 @@ namespace neu
     using delta_t = std::vector<node_t>;
 
     using check_dlm_func_t = std::function<bool(const ch_t ch)>; // func = function
-
-    str_t serialize(const delta_t &delta);
-    delta_t deserialize(const str_t &str);
 };
 
+std::ostream &operator<<(std::ostream &os, const neu::delta_t &delta);
+std::istream &operator>>(std::istream &is, neu::delta_t &delta);
 
 #endif

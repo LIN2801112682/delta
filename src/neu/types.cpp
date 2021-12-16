@@ -1,88 +1,75 @@
 #include "neu/types.h"
-#include <bitset>
-#include <sstream>
 
-namespace neu
+std::size_t calc_serialized_size(const neu::delta_t &delta)
 {
-    str_t serialize(const delta_t &delta)
+    std::size_t size{0};
+    size += sizeof(decltype(delta.size()));
+    for (const auto &node : delta)
     {
-        char buff[4096]{};
-        std::size_t i{0};
-        std::size_t inc;
-
-#define write_buff( src )\
-    inc = sizeof(src);\
-    memcpy(buff + i, &src, inc);\
-    i += inc;\
-
-        auto delte_size{delta.size()};
-        write_buff(delte_size)
-
-        for (const auto &node : delta)
-        {
-            auto node_type{static_cast<char>(node.type_)};
-            write_buff(node_type)
-
-            write_buff(node.low_)
-
-            write_buff(node.high_)
-
-            write_buff(node.native_right_left_offset_)
-
-            auto node_content_length{node.content_.length()};
-            write_buff(node_content_length)
-
-            inc = node_content_length;
-            memcpy(buff + i, node.content_.c_str(), inc);
-            i += inc;
-        }
-
-#undef write_buff
-
-        return str_t(buff, i);
+        size += sizeof(node.type_);
+        size += sizeof(node.low_);
+        size += sizeof(node.high_);
+        size += sizeof(node.native_right_left_offset_);
+        size += sizeof(decltype(node.content_.length()));
+        size += node.content_.length();
     }
+    return size;
+}
 
-    delta_t deserialize(const str_t &str)
+std::ostream &operator<<(std::ostream &os, const neu::delta_t &delta)
+{
+    auto delta_size{delta.size()};
+    os.write((char *)&delta_size, sizeof(delta_size));
+    // std::cout << "<< delta_size: " << delta_size << '\n';
+    for (const auto &node : delta)
     {
-        delta_t delta;
-
-        const char *buff = str.c_str();
-        std::size_t i{0};
-        std::size_t inc;
-
-#define read_buff( dst )\
-    inc = sizeof(dst);\
-    memcpy(&dst, buff + i, inc);\
-    i += inc;\
-
-        delta_t::size_type delta_size;
-        read_buff(delta_size)
-
-        for (decltype(delta_size) delta_idx = 0; delta_idx < delta_size; ++delta_idx)
-        {
-            node_t node;
-            
-            char node_type;
-            read_buff(node_type)
-            node.type_ = static_cast<node_type_enum>(node_type);
-
-            read_buff(node.low_)
-
-            read_buff(node.high_)
-
-            read_buff(node.native_right_left_offset_)
-
-            decltype(node_t::content_.length()) node_content_length;
-            read_buff(node_content_length)
-
-            char node_content[1024]{};
-            inc = node_content_length;
-            memcpy(node_content, buff + i, inc);
-            i += inc;
-            node.content_ = str_t(node_content, node_content_length);
-
-            delta.emplace_back(std::move(node));
-        }
-        return delta;
+        os.write((char *)&node.type_, sizeof(node.type_));
+        os.write((char *)&node.low_, sizeof(node.low_));
+        os.write((char *)&node.high_, sizeof(node.high_));
+        os.write((char *)&node.native_right_left_offset_, sizeof(node.native_right_left_offset_));
+        auto node_content_length{node.content_.length()};
+        os.write((char *)&node_content_length, sizeof(node_content_length));
+        os.write(node.content_.c_str(), node_content_length);
+        /*
+        std::cout << "      type: " << static_cast<int>(node.type_)
+                  << " low: " << node.low_
+                  << " high: " << node.high_
+                  << " native: " << node.native_right_left_offset_
+                  << " contentLength: " << node_content_length
+                  << " content: " << node.content_
+                  << '\n';
+        */
     }
-};
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, neu::delta_t &delta)
+{
+    decltype(delta.size()) delta_size{};
+    is.read((char *)&delta_size, sizeof(delta_size));
+    // std::cout << ">> delta_size: " << delta_size << '\n';
+    delta.resize(delta_size);
+    for (auto &node : delta)
+    {
+        is.read((char *)&node.type_, sizeof(node.type_));
+        is.read((char *)&node.low_, sizeof(node.low_));
+        is.read((char *)&node.high_, sizeof(node.high_));
+        is.read((char *)&node.native_right_left_offset_, sizeof(node.native_right_left_offset_));
+        decltype(node.content_.length()) node_content_length{};
+        is.read((char *)&node_content_length, sizeof(node_content_length));
+        char *node_content_buff = (char *)malloc(node_content_length * sizeof(char));
+        is.read(node_content_buff, node_content_length);
+        node.content_ = std::move(neu::str_t(node_content_buff, node_content_length));
+        free(node_content_buff);
+        /*
+        std::cout << "      type: " << static_cast<int>(node.type_)
+                  << " low: " << node.low_
+                  << " high: " << node.high_
+                  << " native: " << node.native_right_left_offset_
+                  << " contentLength: " << node_content_length
+                  << " content: " << node.content_
+                  << '\n';
+        */
+    }
+    return is;
+}
