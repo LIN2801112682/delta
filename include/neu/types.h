@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <functional>
 #include <tuple>
+#include <iostream>
 
 namespace neu
 {
@@ -47,6 +48,10 @@ namespace neu
     using delta_t = std::vector<node_t>;
 
     using check_dlm_func_t = std::function<bool(const ch_t ch)>; // func = function
+
+    str_t serialize(const delta_t &delta);
+    delta_t deserialize(const str_t &str);
 };
+
 
 #endif
