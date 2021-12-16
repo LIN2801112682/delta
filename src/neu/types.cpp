@@ -58,7 +58,7 @@ namespace neu
         delta_t::size_type delta_size;
         read_buff(delta_size)
 
-        for (decltype(delta_size) i = 0; i < delta_size; ++i)
+        for (decltype(delta_size) delta_idx = 0; delta_idx < delta_size; ++delta_idx)
         {
             node_t node;
             
